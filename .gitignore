@@ -17,6 +17,8 @@
 # Env / secrets
 *.env*
 !*.env.sample
+!*.env.example
+!deploy/.env.example
 *.local
 
 # Node / frontend

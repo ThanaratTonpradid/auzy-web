@@ -95,6 +95,7 @@ func Run(
 		&model.Permission{},
 		&model.RolesHasPermission{},
 		&model.Staff{},
+		&model.VisitorLog{},
 	); err != nil {
 		log.Errorf("Failed to migrate database: %v", err)
 	} else {

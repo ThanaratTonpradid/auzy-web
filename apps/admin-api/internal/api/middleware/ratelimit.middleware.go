@@ -33,10 +33,15 @@ func (m RateLimitMiddleware) RateLimit() echo.MiddlewareFunc {
 	}
 }
 
-// RateLimitByIP applies rate limiting per IP address
+// RateLimitByIP applies rate limiting per IP address (stricter for public visit endpoint)
 func (m RateLimitMiddleware) RateLimitByIP() echo.MiddlewareFunc {
-	// Use echo's built-in rate limiter with per-IP tracking
-	return middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20))
+	return middleware.RateLimiter(middleware.NewRateLimiterMemoryStoreWithConfig(
+		middleware.RateLimiterMemoryStoreConfig{
+			Rate:      rate.Every(time.Second),
+			Burst:     5,
+			ExpiresIn: 3 * time.Minute,
+		},
+	))
 }
 
 // RateLimitStrict applies stricter rate limiting (e.g., for login endpoints)

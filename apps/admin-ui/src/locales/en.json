@@ -54,7 +54,8 @@
     "users": "Users",
     "roles": "Roles",
     "permissions": "Permissions",
-    "staff": "Staff"
+    "staff": "Staff",
+    "visitors": "Visitor logs"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -82,6 +83,16 @@
     "editPermissions": "Edit permissions",
     "noPermissions": "No permissions assigned",
     "updateSuccess": "Role permissions updated"
+  },
+  "visitors": {
+    "title": "Visitor logs",
+    "subtitle": "IP and location records from the public profile",
+    "ip": "IP",
+    "location": "Location",
+    "path": "Path",
+    "userAgent": "User agent",
+    "createdAt": "Time",
+    "total": "{count} total visits"
   },
   "profile": {
     "title": "Profile",

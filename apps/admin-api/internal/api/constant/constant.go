@@ -4,6 +4,7 @@ import "time"
 
 const TTLJWTExpires = 1 * time.Hour               // Access token expires in 1 hour
 const TTLRefreshTokenExpires = 7 * 24 * time.Hour // Refresh token expires in 7 days
+const TTLGeoIPCache = 24 * time.Hour
 const KeySession = "session"
 
 const (
@@ -32,6 +33,8 @@ const (
 	StaffsRead   = "STAFFS_READ"
 	StaffsUpdate = "STAFFS_UPDATE"
 	StaffsDelete = "STAFFS_DELETE"
+
+	VisitorsRead = "VISITORS_READ"
 )
 
 const (

@@ -29,13 +29,6 @@ func NewPermissionsService(
 }
 
 func (svc PermissionsService) InitPermissions() {
-	// Check if permissions already exist
-	existingPermission, err := svc.repository.FindOnePermissionByCodeName(constant.RolesRead)
-	if err == nil && existingPermission.ID > 0 {
-		svc.logger.Info("Permissions already initialized, skipping...")
-		return
-	}
-	
 	permissions := []string{
 		constant.RolesRead,
 		constant.RolesCreate,
@@ -45,13 +38,17 @@ func (svc PermissionsService) InitPermissions() {
 		constant.StaffsCreate,
 		constant.StaffsUpdate,
 		constant.StaffsDelete,
+		constant.VisitorsRead,
 	}
-	svc.logger.Info("Start init permission")
+	svc.logger.Info("Start ensure permissions")
 	for _, code := range permissions {
+		if _, err := svc.repository.FindOnePermissionByCodeName(code); err == nil {
+			continue
+		}
 		svc.logger.Infof("Insert: %s", code)
 		svc.CreatePermission(code)
 	}
-	svc.logger.Info("Init permission complete")
+	svc.logger.Info("Ensure permissions complete")
 }
 
 func (svc PermissionsService) FindOnePermissionByID(permissionID uint32) (model.Permission, error) {

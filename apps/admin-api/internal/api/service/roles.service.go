@@ -39,7 +39,8 @@ func NewRolesService(
 func (svc RolesService) InitRoles() {
 	existingRole, err := svc.repository.FindOneRoleByLabel(constant.RoleAdmin)
 	if err == nil && existingRole.ID > 0 {
-		svc.logger.Info("Roles already initialized, skipping...")
+		svc.logger.Info("Roles already initialized, ensuring visitor permission...")
+		svc.EnsureRolePermission(existingRole.ID, constant.VisitorsRead)
 		return
 	}
 
@@ -55,6 +56,7 @@ func (svc RolesService) InitRoles() {
 				constant.StaffsCreate,
 				constant.StaffsUpdate,
 				constant.StaffsDelete,
+				constant.VisitorsRead,
 			},
 		},
 		{
@@ -82,6 +84,26 @@ func (svc RolesService) InitRoles() {
 		}
 	}
 	svc.logger.Info("Init role complete")
+}
+
+func (svc RolesService) EnsureRolePermission(roleID uint32, permissionCode string) {
+	permission, err := svc.repository.FindOnePermissionByCodeName(permissionCode)
+	if err != nil || permission.ID == 0 {
+		svc.logger.Warnf("permission %s not found while ensuring role assignment", permissionCode)
+		return
+	}
+	codes, err := svc.repository.FindPermissionCodeNamesByRoleID(roleID)
+	if err != nil {
+		svc.logger.Warn(err)
+		return
+	}
+	for _, code := range codes {
+		if code == permissionCode {
+			return
+		}
+	}
+	svc.logger.Infof("Assign %s to role#%d", permissionCode, roleID)
+	svc.CreateRoleHasPermissions(roleID, permission.ID)
 }
 
 func (svc RolesService) ListRoles() (dto.RoleListResponse, error) {

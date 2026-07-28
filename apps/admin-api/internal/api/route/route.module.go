@@ -8,6 +8,7 @@ var Module = fx.Options(
 	fx.Provide(NewAuthRoute),
 	fx.Provide(NewStaffRoute),
 	fx.Provide(NewRoleRoute),
+	fx.Provide(NewVisitorRoute),
 )
 
 type Route interface {
@@ -21,12 +22,14 @@ func NewRoutes(
 	auth AuthRoute,
 	staff StaffRoute,
 	role RoleRoute,
+	visitor VisitorRoute,
 ) Routes {
 	return Routes{
 		swagger,
 		auth,
 		staff,
 		role,
+		visitor,
 	}
 }
 

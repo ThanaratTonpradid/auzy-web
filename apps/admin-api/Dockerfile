@@ -26,7 +26,6 @@ RUN apk --no-cache add ca-certificates tzdata
 
 # Copy binary from builder
 COPY --from=builder /app/auzy-api .
-COPY --from=builder /app/local.env .
 
 EXPOSE 1323
 

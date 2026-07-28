@@ -54,7 +54,8 @@
     "users": "ผู้ใช้",
     "roles": "บทบาท",
     "permissions": "สิทธิ์",
-    "staff": "พนักงาน"
+    "staff": "พนักงาน",
+    "visitors": "บันทึกผู้เข้าชม"
   },
   "dashboard": {
     "title": "แดชบอร์ด",
@@ -82,6 +83,16 @@
     "editPermissions": "แก้ไขสิทธิ์",
     "noPermissions": "ยังไม่มีสิทธิ์",
     "updateSuccess": "อัปเดตสิทธิ์ของบทบาทแล้ว"
+  },
+  "visitors": {
+    "title": "บันทึกผู้เข้าชม",
+    "subtitle": "รายการ IP และตำแหน่งจากหน้าโปรไฟล์สาธารณะ",
+    "ip": "IP",
+    "location": "ตำแหน่ง",
+    "path": "พาธ",
+    "userAgent": "User agent",
+    "createdAt": "เวลา",
+    "total": "ทั้งหมด {count} ครั้ง"
   },
   "profile": {
     "title": "โปรไฟล์",

@@ -62,6 +62,14 @@ onMounted(async () => {
             >
               {{ $t('menu.roles') }}
             </v-btn>
+            <v-btn
+              v-if="staffStore.canReadVisitors"
+              size="small"
+              variant="tonal"
+              :to="{ name: 'visitor-logs' }"
+            >
+              {{ $t('menu.visitors') }}
+            </v-btn>
             <v-btn size="small" variant="tonal" :to="{ name: 'profile' }">
               {{ $t('menu.profile') }}
             </v-btn>

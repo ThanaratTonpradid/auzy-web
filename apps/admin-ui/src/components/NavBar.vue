@@ -33,6 +33,12 @@ const { navIsOpen } = storeToRefs(appStore);
         :to="{ name: 'roles' }"
         prepend-icon="mdi-shield-account"
       />
+      <v-list-item
+        v-if="staffStore.canReadVisitors"
+        :title="$t('menu.visitors')"
+        :to="{ name: 'visitor-logs' }"
+        prepend-icon="mdi-map-marker-path"
+      />
     </v-list>
   </v-navigation-drawer>
 </template>

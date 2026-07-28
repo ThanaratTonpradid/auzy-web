@@ -48,3 +48,23 @@ cd apps/admin-ui && pnpm dev
 pnpm build:api
 pnpm build:ui
 ```
+
+## Production (DigitalOcean $6 droplet)
+
+Target: Basic Shared CPU Regular, 1 vCPU / 1GB RAM / 25GB SSD, SGP1, Debian 13.
+
+```sh
+# On the droplet (as root)
+bash deploy/setup-droplet.sh
+
+# Copy repo to /opt/auzy-web, then:
+cp deploy/.env.example deploy/.env
+# edit secrets in deploy/.env
+docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build
+```
+
+Notes:
+- Public profile is at `/` and records visits via `POST /api/public/visit`
+- Admin UI is at `/pub/login` then `/pri/*`
+- Visitor log retention cron is installed by `setup-droplet.sh` (default 90 days)
+- If upgrading MySQL/Redis major versions locally, reset `apps/admin-api/.development/data/*` first

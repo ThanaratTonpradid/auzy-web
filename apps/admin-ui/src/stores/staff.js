@@ -40,6 +40,9 @@ export const useStaffStore = defineStore('staff', {
     canUpdateRoles() {
       return this.hasPermission(Permissions.ROLES_UPDATE);
     },
+    canReadVisitors() {
+      return this.hasPermission(Permissions.VISITORS_READ);
+    },
   },
   actions: {
     async getProfileAction() {

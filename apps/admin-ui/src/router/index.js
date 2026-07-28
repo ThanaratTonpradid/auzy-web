@@ -4,6 +4,8 @@ import { loginRoute } from './auth.route';
 import { dashboardRoute } from './dashboard.route';
 import { staffRoute } from './staff.route';
 import { rolesRoute } from './roles.route';
+import { publicProfileRoute } from './public-profile.route';
+import { visitorLogsRoute } from './visitor-logs.route';
 import { routerHook } from './router-hook';
 
 const router = createRouter({
@@ -11,7 +13,9 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: { name: 'dashboard' },
+      component: () => import('../layouts/PublicLayout.vue'),
+      children: [publicProfileRoute],
+      meta: { requiresAuth: false },
     },
     {
       path: '/pub',
@@ -22,7 +26,7 @@ const router = createRouter({
     {
       path: '/pri',
       component: () => import('../layouts/PrivateLayout.vue'),
-      children: [dashboardRoute, profileRoute, staffRoute, rolesRoute],
+      children: [dashboardRoute, profileRoute, staffRoute, rolesRoute, visitorLogsRoute],
       meta: { requiresAuth: true },
     },
   ],
