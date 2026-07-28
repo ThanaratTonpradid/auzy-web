@@ -1,5 +1,5 @@
 export const rolesRoute = {
-  path: '/roles',
+  path: 'roles',
   name: 'roles',
   component: () => import('../pages/RolesPage.vue'),
   meta: { requiresAuth: true, permission: 'ROLES_READ' },

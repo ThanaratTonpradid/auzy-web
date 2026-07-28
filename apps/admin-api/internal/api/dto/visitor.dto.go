@@ -1,5 +1,7 @@
 package dto
 
+import "auzy-api/model"
+
 type (
 	RecordVisitRequest struct {
 		Path    string `json:"path" example:"/"`
@@ -7,17 +9,13 @@ type (
 	}
 
 	VisitorLogItem struct {
-		ID        uint32   `json:"id"`
-		IP        string   `json:"ip"`
-		Country   *string  `json:"country"`
-		Region    *string  `json:"region"`
-		City      *string  `json:"city"`
-		Latitude  *float64 `json:"latitude"`
-		Longitude *float64 `json:"longitude"`
-		UserAgent *string  `json:"userAgent"`
-		Path      *string  `json:"path"`
-		Referer   *string  `json:"referer"`
-		CreatedAt uint32   `json:"createdAt"`
+		ID        uint32                 `json:"id"`
+		IP        string                 `json:"ip"`
+		Metadata  *model.LocationMetadata `json:"metadata"`
+		UserAgent *string                `json:"userAgent"`
+		Path      *string                `json:"path"`
+		Referer   *string                `json:"referer"`
+		CreatedAt uint32                 `json:"createdAt"`
 	}
 
 	VisitorLogListResponse struct {

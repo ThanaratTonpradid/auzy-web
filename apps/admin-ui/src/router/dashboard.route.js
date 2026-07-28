@@ -1,5 +1,5 @@
 export const dashboardRoute = {
-  path: '/dashboard',
+  path: 'dashboard',
   name: 'dashboard',
   component: () => import('../pages/DashboardPage.vue'),
   meta: { requiresAuth: true },

@@ -20,7 +20,8 @@ const headers = computed(() => [
 ]);
 
 const formatLocation = (item) => {
-  const parts = [item.city, item.region, item.country].filter(Boolean);
+  const meta = item.metadata || {};
+  const parts = [meta.city, meta.region, meta.country].filter(Boolean);
   return parts.length ? parts.join(', ') : '-';
 };
 

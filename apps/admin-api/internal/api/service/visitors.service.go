@@ -11,8 +11,8 @@ import (
 )
 
 type VisitorService struct {
-	logger      *logger.Logger
-	repository  *repository.Handler
+	logger       *logger.Logger
+	repository   *repository.Handler
 	geoIPService GeoIPService
 }
 
@@ -49,22 +49,19 @@ func (svc VisitorService) RecordVisit(ip, userAgent string, req *dto.RecordVisit
 	}
 
 	if geo, err := svc.geoIPService.Lookup(ip); err == nil && geo != nil {
-		if geo.Country != "" {
-			country := geo.Country
-			entity.Country = &country
+		meta := &model.LocationMetadata{
+			Country: geo.Country,
+			Region:  geo.Region,
+			City:    geo.City,
+			Source:  "ip-api",
 		}
-		if geo.Region != "" {
-			region := geo.Region
-			entity.Region = &region
+		if geo.Latitude != 0 || geo.Longitude != 0 {
+			lat := geo.Latitude
+			lon := geo.Longitude
+			meta.Latitude = &lat
+			meta.Longitude = &lon
 		}
-		if geo.City != "" {
-			city := geo.City
-			entity.City = &city
-		}
-		lat := geo.Latitude
-		lon := geo.Longitude
-		entity.Latitude = &lat
-		entity.Longitude = &lon
+		entity.Metadata = meta
 	}
 
 	if err := svc.repository.CreateVisitorLog(&entity); err != nil {
@@ -99,11 +96,7 @@ func (svc VisitorService) ListVisits(page, limit int) (dto.VisitorLogListRespons
 		items = append(items, dto.VisitorLogItem{
 			ID:        log.ID,
 			IP:        log.IP,
-			Country:   log.Country,
-			Region:    log.Region,
-			City:      log.City,
-			Latitude:  log.Latitude,
-			Longitude: log.Longitude,
+			Metadata:  log.Metadata,
 			UserAgent: log.UserAgent,
 			Path:      log.Path,
 			Referer:   log.Referer,

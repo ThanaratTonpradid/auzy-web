@@ -100,6 +100,7 @@ func Run(
 		log.Errorf("Failed to migrate database: %v", err)
 	} else {
 		log.Info("Database migrations completed successfully")
+		dropObsoleteVisitorColumns(mysql, log)
 	}
 	
 	isInitData, err := strconv.ParseBool(cfg.InitData)
@@ -151,4 +152,17 @@ func Run(
 			return fp.Remove()
 		},
 	})
+}
+
+func dropObsoleteVisitorColumns(mysql *lib.MySQL, log *logger.Logger) {
+	obsolete := []string{"country", "region", "city", "latitude", "longitude"}
+	for _, column := range obsolete {
+		if mysql.DB.Migrator().HasColumn(&model.VisitorLog{}, column) {
+			if err := mysql.DB.Migrator().DropColumn(&model.VisitorLog{}, column); err != nil {
+				log.Warnf("failed to drop visitor_logs.%s: %v", column, err)
+			} else {
+				log.Infof("dropped obsolete column visitor_logs.%s", column)
+			}
+		}
+	}
 }

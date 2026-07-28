@@ -15,14 +15,13 @@ const profile = {
   links: [
     {
       label: 'Admin',
-      href: '/pub/login',
-      internal: true,
+      name: 'login',
     },
   ],
 };
 
-const goInternal = (path) => {
-  router.push(path);
+const goInternal = (name) => {
+  router.push({ name });
 };
 
 onMounted(() => {
@@ -47,10 +46,10 @@ onMounted(() => {
       <div class="public-profile__links">
         <template v-for="link in profile.links" :key="link.label">
           <button
-            v-if="link.internal"
+            v-if="link.name"
             type="button"
             class="public-profile__link"
-            @click="goInternal(link.href)"
+            @click="goInternal(link.name)"
           >
             {{ link.label }}
           </button>
