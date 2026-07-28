@@ -2,22 +2,29 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAuthStore } from '../auth';
 import * as authService from '../../services/auth';
+import * as staffService from '../../services/staff';
 import { ConfigName } from '../../constants';
 
-// Mock router
 vi.mock('../../router', () => ({
   default: {
     replace: vi.fn(),
   },
 }));
 
-// Mock auth services
 vi.mock('../../services/auth', () => ({
   loginService: vi.fn(),
   logoutService: vi.fn(),
 }));
 
-// Mock localStorage
+vi.mock('../../services/staff', () => ({
+  getProfileService: vi.fn(),
+  listStaffService: vi.fn(),
+  getStaffService: vi.fn(),
+  createStaffService: vi.fn(),
+  updateStaffService: vi.fn(),
+  deleteStaffService: vi.fn(),
+}));
+
 const localStorageMock = (() => {
   let store = {};
   return {
@@ -54,16 +61,26 @@ describe('Auth Store', () => {
       token: 'mock-token',
       refreshToken: 'mock-refresh-token',
       expiresIn: 3600,
-      user: { id: 1, username: 'testuser' },
+    };
+    const mockProfile = {
+      id: 1,
+      username: 'testuser',
+      fullname: 'Test User',
+      roleId: 1,
+      roleLabel: 'ADMIN',
+      isActive: true,
+      isAdmin: true,
+      permissions: ['STAFFS_READ'],
     };
 
     authService.loginService.mockResolvedValue(mockResponse);
+    staffService.getProfileService.mockResolvedValue(mockProfile);
 
     const store = useAuthStore();
     await store.loginAction({ username: 'testuser', password: 'password' });
 
     expect(store.isLogin).toBe(true);
-    expect(store.user).toEqual(mockResponse.user);
+    expect(store.user.username).toBe('testuser');
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
       ConfigName.ACCESS_TOKEN,
       mockResponse.token
@@ -78,7 +95,7 @@ describe('Auth Store', () => {
     authService.loginService.mockRejectedValue(new Error('Invalid credentials'));
 
     const store = useAuthStore();
-    
+
     await expect(
       store.loginAction({ username: 'testuser', password: 'wrongpassword' })
     ).rejects.toThrow('Invalid credentials');
@@ -90,7 +107,6 @@ describe('Auth Store', () => {
   it('logs out successfully', async () => {
     authService.logoutService.mockResolvedValue({ success: true });
 
-    // Setup logged in state
     localStorageMock.setItem(ConfigName.ACCESS_TOKEN, 'mock-token');
     localStorageMock.setItem(ConfigName.REFRESH_TOKEN, 'mock-refresh-token');
 
@@ -109,12 +125,9 @@ describe('Auth Store', () => {
   it('checks auth status correctly', () => {
     const store = useAuthStore();
 
-    // Not logged in
     expect(store.checkAuth()).toBe(false);
 
-    // Logged in
     localStorageMock.setItem(ConfigName.ACCESS_TOKEN, 'mock-token');
     expect(store.checkAuth()).toBe(true);
   });
 });
-

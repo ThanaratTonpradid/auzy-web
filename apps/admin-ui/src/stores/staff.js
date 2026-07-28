@@ -1,32 +1,58 @@
 import { defineStore } from 'pinia';
 import { getProfileService } from '../services/staff';
+import { Permissions } from '../constants';
 
-const defaultValue = {
-    id: 0,
-    username: '',
-    fullname: '',
-    roleId: 0,
-    isActive: false,
+const defaultProfile = {
+  id: 0,
+  username: '',
+  fullname: '',
+  roleId: 0,
+  roleLabel: '',
+  isActive: false,
+  isAdmin: false,
+  permissions: [],
 };
 
 export const useStaffStore = defineStore('staff', {
   state: () => ({
-    profile: defaultValue,
-    permission: [],
+    profile: { ...defaultProfile },
   }),
+  getters: {
+    permissions: (state) => state.profile.permissions || [],
+    isAdmin: (state) => !!state.profile.isAdmin,
+    hasPermission: (state) => (code) => {
+      if (state.profile.isAdmin) return true;
+      return (state.profile.permissions || []).includes(code);
+    },
+    canReadStaff() {
+      return this.hasPermission(Permissions.STAFFS_READ);
+    },
+    canManageStaff() {
+      return (
+        this.hasPermission(Permissions.STAFFS_CREATE) ||
+        this.hasPermission(Permissions.STAFFS_UPDATE) ||
+        this.hasPermission(Permissions.STAFFS_DELETE)
+      );
+    },
+    canReadRoles() {
+      return this.hasPermission(Permissions.ROLES_READ);
+    },
+    canUpdateRoles() {
+      return this.hasPermission(Permissions.ROLES_UPDATE);
+    },
+  },
   actions: {
     async getProfileAction() {
-      try {
-        const res = await getProfileService();
-        this.profile = {
-            ...this.profile,
-            ...res,
-        };
-      } catch (error) {
-        if (error.response.data.errorCode === "UNAUTHORIZED") {
-            this.profile = defaultValue;
-        }
-      }
+      const res = await getProfileService();
+      this.profile = {
+        ...defaultProfile,
+        ...res,
+        permissions: res.permissions || [],
+      };
+      return this.profile;
+    },
+    clearProfile() {
+      this.profile = { ...defaultProfile };
     },
   },
 });

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"mini-api/internal/api/constant"
-	"mini-api/lib"
+	"auzy-api/internal/api/constant"
+	"auzy-api/lib"
 )
 
 func GetUnixTimestamp() uint32 {

@@ -3,7 +3,7 @@ package repository
 import (
 	"github.com/dollarsignteam/go-logger"
 
-	"mini-api/lib"
+	"auzy-api/lib"
 )
 
 type Handler struct {

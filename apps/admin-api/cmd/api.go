@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/fx"
 
-	"mini-api/internal/api"
+	"auzy-api/internal/api"
 )
 
 var apiCmd = &cobra.Command{

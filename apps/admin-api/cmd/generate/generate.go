@@ -5,7 +5,7 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gorm"
 
-	"mini-api/config"
+	"auzy-api/config"
 )
 
 func main() {

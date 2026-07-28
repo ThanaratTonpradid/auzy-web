@@ -7,7 +7,7 @@ import (
 
 	"github.com/dollarsignteam/go-logger"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 var log *logger.Logger

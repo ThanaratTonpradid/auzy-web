@@ -2,12 +2,12 @@
 
 Monorepo for Auzy admin web:
 
-- `apps/admin-api` — Go admin API (`mini-api`)
+- `apps/admin-api` — Go admin API (`auzy-api`)
 - `apps/admin-ui` — Vue 3 + Vite admin UI
 
 ## Prerequisites
 
-- Go 1.19+
+- Go 1.25+
 - Node.js 18+
 - [pnpm](https://pnpm.io/)
 - Docker (for local API infra)
@@ -25,7 +25,7 @@ cp apps/admin-api/local.env.sample apps/admin-api/local.env
 ## Development
 
 ```sh
-# Start local infra (MySQL/Redis via docker-compose)
+# Start local infra (MySQL 9.7 / Redis 8.8 via docker-compose)
 pnpm infra:up
 
 # API (from repo root)

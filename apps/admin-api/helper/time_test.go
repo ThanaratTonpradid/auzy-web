@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 func TestParseBangkokTime(t *testing.T) {

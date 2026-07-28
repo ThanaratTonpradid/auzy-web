@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 func TestGetHostDomain(t *testing.T) {

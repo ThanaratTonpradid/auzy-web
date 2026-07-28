@@ -4,7 +4,7 @@ import (
 	"github.com/dollarsignteam/go-logger"
 	"github.com/spf13/viper"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 var log *logger.Logger

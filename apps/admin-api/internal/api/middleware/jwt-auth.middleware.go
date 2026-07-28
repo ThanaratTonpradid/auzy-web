@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 
-	"mini-api/internal/api/constant"
-	"mini-api/internal/api/dto"
-	"mini-api/internal/api/service"
-	"mini-api/lib"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
+	"auzy-api/internal/api/service"
+	"auzy-api/lib"
 )
 
 type JWTAuthMiddleware struct {
@@ -31,17 +31,19 @@ func NewJWTAuthMiddleware(
 }
 
 func (mw JWTAuthMiddleware) JWTAuth() echo.MiddlewareFunc {
-	return middleware.JWTWithConfig(middleware.JWTConfig{
-		Claims:         &jwt.StandardClaims{},
+	return echojwt.WithConfig(echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(jwt.RegisteredClaims)
+		},
 		SigningKey:     mw.jwtHandler.Options.JWTSecret,
 		ParseTokenFunc: mw.ParseToken,
 	})
 }
 
-func (mw JWTAuthMiddleware) ParseToken(auth string, c echo.Context) (interface{}, error) {
-	claims := jwt.StandardClaims{}
+func (mw JWTAuthMiddleware) ParseToken(c echo.Context, auth string) (interface{}, error) {
+	claims := jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(auth, &claims, func(t *jwt.Token) (interface{}, error) {
-		if t.Method.Alg() != middleware.AlgorithmHS256 {
+		if t.Method.Alg() != echojwt.AlgorithmHS256 {
 			return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
 		}
 		return mw.jwtHandler.Options.JWTSecret, nil
@@ -60,7 +62,7 @@ func (mw JWTAuthMiddleware) ParseToken(auth string, c echo.Context) (interface{}
 	return token, nil
 }
 
-func (mw JWTAuthMiddleware) GetSession(claims jwt.StandardClaims) (dto.Session, error) {
+func (mw JWTAuthMiddleware) GetSession(claims jwt.RegisteredClaims) (dto.Session, error) {
 	id, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		return dto.Session{}, err
@@ -69,7 +71,7 @@ func (mw JWTAuthMiddleware) GetSession(claims jwt.StandardClaims) (dto.Session, 
 	if err != nil {
 		return dto.Session{}, errors.New("session not found")
 	}
-	if claims.Id != session.ID {
+	if claims.ID != session.ID {
 		return dto.Session{}, errors.New("invalid session")
 	}
 	return session, nil

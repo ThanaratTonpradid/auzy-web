@@ -8,9 +8,9 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/swaggo/swag"
 
-	"mini-api/config"
-	"mini-api/internal/api/doc"
-	"mini-api/lib"
+	"auzy-api/config"
+	"auzy-api/internal/api/doc"
+	"auzy-api/lib"
 )
 
 //	@securityDefinitions.apikey	Bearer
@@ -34,7 +34,7 @@ func NewSwaggerRoute(
 }
 
 func (r SwaggerRoute) Setup() {
-	doc.SwaggerInfoAPI.Title = "MINI API"
+	doc.SwaggerInfoAPI.Title = "AUZY API"
 	doc.SwaggerInfoAPI.Version = config.Version
 	swag.Register(swag.Name, doc.SwaggerInfoAPI)
 

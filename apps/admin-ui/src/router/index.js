@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { profileRoute } from './profile.route';
 import { loginRoute } from './auth.route';
+import { dashboardRoute } from './dashboard.route';
+import { staffRoute } from './staff.route';
+import { rolesRoute } from './roles.route';
 import { routerHook } from './router-hook';
 
 const router = createRouter({
@@ -8,7 +11,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: { name: 'login' },
+      redirect: { name: 'dashboard' },
     },
     {
       path: '/pub',
@@ -19,13 +22,12 @@ const router = createRouter({
     {
       path: '/pri',
       component: () => import('../layouts/PrivateLayout.vue'),
-      children: [profileRoute],
+      children: [dashboardRoute, profileRoute, staffRoute, rolesRoute],
       meta: { requiresAuth: true },
     },
   ],
 });
 
-// GOOD
 router.beforeEach(routerHook);
 
 export default router;

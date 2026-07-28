@@ -12,8 +12,11 @@
     "infra:up": "make -C apps/admin-api infra-up",
     "infra:down": "make -C apps/admin-api infra-down"
   },
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=18"
+  },
+  "pnpm": {
+    "minimumReleaseAge": 0
   }
 }

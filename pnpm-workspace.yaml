@@ -1,2 +1,4 @@
 packages:
   - "apps/admin-ui"
+
+minimumReleaseAge: 0

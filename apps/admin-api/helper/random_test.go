@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 func TestRandInt64(t *testing.T) {

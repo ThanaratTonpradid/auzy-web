@@ -43,6 +43,7 @@ lerna-debug.log*
 go.work
 go.work.sum
 main
+auzy-api
 mini-api
 apps/admin-api/.development/data*
 

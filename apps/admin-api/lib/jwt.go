@@ -3,9 +3,9 @@ package lib
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 type JWTToken struct {
@@ -16,8 +16,8 @@ type JWTToken struct {
 }
 
 type JWTOptions struct {
-	JWTSecret            []byte
-	JWTExpiresTTL        time.Duration
+	JWTSecret              []byte
+	JWTExpiresTTL          time.Duration
 	RefreshTokenExpiresTTL time.Duration
 }
 
@@ -33,12 +33,12 @@ func NewJWTHandler(opts JWTOptions) *JWTHandler {
 
 func (h JWTHandler) CreateToken(subject string) (JWTToken, error) {
 	id := helper.UUID()
-	issuedAt := time.Now().Unix()
-	expiresAt := time.Now().Add(h.Options.JWTExpiresTTL).Unix()
-	claims := &jwt.StandardClaims{
-		Id:        id,
-		ExpiresAt: expiresAt,
-		IssuedAt:  issuedAt,
+	now := time.Now()
+	expiresAt := now.Add(h.Options.JWTExpiresTTL)
+	claims := &jwt.RegisteredClaims{
+		ID:        id,
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		IssuedAt:  jwt.NewNumericDate(now),
 		Subject:   subject,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -46,19 +46,19 @@ func (h JWTHandler) CreateToken(subject string) (JWTToken, error) {
 	return JWTToken{
 		ID:        id,
 		Token:     tokenString,
-		IssuedAt:  issuedAt,
-		ExpiresAt: expiresAt,
+		IssuedAt:  now.Unix(),
+		ExpiresAt: expiresAt.Unix(),
 	}, err
 }
 
 func (h JWTHandler) CreateRefreshToken(subject string) (JWTToken, error) {
 	id := helper.UUID()
-	issuedAt := time.Now().Unix()
-	expiresAt := time.Now().Add(h.Options.RefreshTokenExpiresTTL).Unix()
-	claims := &jwt.StandardClaims{
-		Id:        id,
-		ExpiresAt: expiresAt,
-		IssuedAt:  issuedAt,
+	now := time.Now()
+	expiresAt := now.Add(h.Options.RefreshTokenExpiresTTL)
+	claims := &jwt.RegisteredClaims{
+		ID:        id,
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		IssuedAt:  jwt.NewNumericDate(now),
 		Subject:   subject,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -66,20 +66,20 @@ func (h JWTHandler) CreateRefreshToken(subject string) (JWTToken, error) {
 	return JWTToken{
 		ID:        id,
 		Token:     tokenString,
-		IssuedAt:  issuedAt,
-		ExpiresAt: expiresAt,
+		IssuedAt:  now.Unix(),
+		ExpiresAt: expiresAt.Unix(),
 	}, err
 }
 
-func (h JWTHandler) VerifyToken(tokenString string) (*jwt.StandardClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (h JWTHandler) VerifyToken(tokenString string) (*jwt.RegisteredClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return h.Options.JWTSecret, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	if claims, ok := token.Claims.(*jwt.StandardClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
 		return claims, nil
 	}
-	return nil, jwt.ErrSignatureInvalid
+	return nil, jwt.ErrTokenSignatureInvalid
 }

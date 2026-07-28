@@ -3,10 +3,11 @@ package service
 import (
 	"github.com/dollarsignteam/go-logger"
 
-	"mini-api/internal/api/constant"
-	"mini-api/internal/repository"
-	"mini-api/lib"
-	"mini-api/model"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
+	"auzy-api/internal/repository"
+	"auzy-api/lib"
+	"auzy-api/model"
 )
 
 type PermissionsService struct {
@@ -74,4 +75,20 @@ func (svc PermissionsService) CreatePermission(code string) (model.Permission, e
 		return NewCommonErrorSomethingWentWrong(model.Permission{}, err)
 	}
 	return svc.FindOnePermissionByID(entity.ID)
+}
+
+func (svc PermissionsService) ListPermissions() (dto.PermissionListResponse, error) {
+	permissions, err := svc.repository.FindAllPermissions()
+	if err != nil {
+		svc.logger.Error(err)
+		return NewCommonErrorSomethingWentWrong(dto.PermissionListResponse{}, err)
+	}
+	items := make([]dto.PermissionItem, 0, len(permissions))
+	for _, p := range permissions {
+		items = append(items, dto.PermissionItem{
+			ID:       p.ID,
+			CodeName: p.CodeName,
+		})
+	}
+	return dto.PermissionListResponse{Items: items}, nil
 }

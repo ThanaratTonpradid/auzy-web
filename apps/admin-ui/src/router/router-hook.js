@@ -1,36 +1,42 @@
 import { ConfigName } from '../constants';
 import { useAuthStore } from '../stores/auth';
+import { useStaffStore } from '../stores/staff';
 
 export const routerHook = async (to, from, next) => {
   const authStore = useAuthStore();
-  
-  // Check if user has token
+  const staffStore = useStaffStore();
+
   const token = localStorage.getItem(ConfigName.ACCESS_TOKEN);
   const isAuthenticated = !!token;
-  
-  // Update auth store state
   authStore.isLogin = isAuthenticated;
 
-  // Route requires authentication
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
-      // Not authenticated, redirect to login
-      console.log('Redirecting to login - no auth');
       next({ name: 'login' });
-    } else {
-      // Authenticated, allow access
-      next();
+      return;
     }
-  } 
-  // Public route (login page)
-  else {
-    if (isAuthenticated && to.name === 'login') {
-      // Already authenticated, redirect to profile
-      console.log('Redirecting to profile - already authenticated');
-      next({ name: 'profile' });
-    } else {
-      // Allow access to public route
-      next();
+
+    if (!staffStore.profile?.id) {
+      const ok = await authStore.bootstrapAuth();
+      if (!ok) {
+        next({ name: 'login' });
+        return;
+      }
     }
+
+    if (to.meta.permission && !staffStore.hasPermission(to.meta.permission)) {
+      next({ name: 'dashboard' });
+      return;
+    }
+
+    next();
+    return;
   }
+
+  if (isAuthenticated && to.name === 'login') {
+    next({ name: 'dashboard' });
+    return;
+  }
+
+  next();
 };

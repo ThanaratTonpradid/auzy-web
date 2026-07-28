@@ -7,15 +7,15 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/fx/fxevent"
 
-	"mini-api/config"
-	"mini-api/helper"
+	"auzy-api/config"
+	"auzy-api/helper"
 )
 
 var cfgFile string
 var log *logger.Logger
 
 var rootCmd = &cobra.Command{
-	Use:     "mini-api",
+	Use:     "auzy-api",
 	Short:   "mini api",
 	Version: config.Version,
 	CompletionOptions: cobra.CompletionOptions{

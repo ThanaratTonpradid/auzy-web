@@ -1,12 +1,16 @@
 package service
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/dollarsignteam/go-logger"
 
-	"mini-api/internal/api/constant"
-	"mini-api/internal/repository"
-	"mini-api/lib"
-	"mini-api/model"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
+	"auzy-api/internal/repository"
+	"auzy-api/lib"
+	"auzy-api/model"
 )
 
 type RoleDefault struct {
@@ -33,41 +37,41 @@ func NewRolesService(
 }
 
 func (svc RolesService) InitRoles() {
-	// Check if roles already exist
 	existingRole, err := svc.repository.FindOneRoleByLabel(constant.RoleAdmin)
 	if err == nil && existingRole.ID > 0 {
 		svc.logger.Info("Roles already initialized, skipping...")
 		return
 	}
-	
-	roles := []RoleDefault{}
-	roles = append(roles, RoleDefault{
-		Label: constant.RoleAdmin,
-		Permissions: []string{
-			constant.RolesRead,
-			constant.RolesCreate,
-			constant.RolesUpdate,
-			constant.RolesDelete,
-			constant.StaffsRead,
-			constant.StaffsCreate,
-			constant.StaffsUpdate,
-			constant.StaffsDelete,
+
+	roles := []RoleDefault{
+		{
+			Label: constant.RoleAdmin,
+			Permissions: []string{
+				constant.RolesRead,
+				constant.RolesCreate,
+				constant.RolesUpdate,
+				constant.RolesDelete,
+				constant.StaffsRead,
+				constant.StaffsCreate,
+				constant.StaffsUpdate,
+				constant.StaffsDelete,
+			},
 		},
-	})
-	roles = append(roles, RoleDefault{
-		Label: constant.RoleStaff,
-		Permissions: []string{
-			constant.RolesRead,
-			constant.StaffsRead,
+		{
+			Label: constant.RoleStaff,
+			Permissions: []string{
+				constant.RolesRead,
+				constant.StaffsRead,
+			},
 		},
-	})
-	roles = append(roles, RoleDefault{
-		Label: constant.RoleMember,
-		Permissions: []string{
-			constant.RolesRead,
-			constant.StaffsRead,
+		{
+			Label: constant.RoleMember,
+			Permissions: []string{
+				constant.RolesRead,
+				constant.StaffsRead,
+			},
 		},
-	})
+	}
 	svc.logger.Info("Start init role")
 	for _, r := range roles {
 		svc.logger.Infof("Insert: %s", r.Label)
@@ -78,6 +82,95 @@ func (svc RolesService) InitRoles() {
 		}
 	}
 	svc.logger.Info("Init role complete")
+}
+
+func (svc RolesService) ListRoles() (dto.RoleListResponse, error) {
+	roles, err := svc.repository.FindAllRoles()
+	if err != nil {
+		svc.logger.Error(err)
+		return NewCommonErrorSomethingWentWrong(dto.RoleListResponse{}, err)
+	}
+	items := make([]dto.RoleListItem, 0, len(roles))
+	for _, role := range roles {
+		permissions, err := svc.repository.FindPermissionCodeNamesByRoleID(role.ID)
+		if err != nil {
+			permissions = []string{}
+		}
+		if permissions == nil {
+			permissions = []string{}
+		}
+		items = append(items, dto.RoleListItem{
+			ID:          role.ID,
+			Label:       role.Label,
+			Permissions: permissions,
+		})
+	}
+	return dto.RoleListResponse{Items: items}, nil
+}
+
+func (svc RolesService) GetRoleByID(roleID uint32) (dto.RoleDetailResponse, error) {
+	role, err := svc.repository.FindOneRoleByID(roleID)
+	if err != nil {
+		return dto.RoleDetailResponse{}, lib.CommonError{
+			StatusCode:    http.StatusNotFound,
+			ErrorCode:     constant.ErrCodeNotFound,
+			ErrorInstance: err,
+		}
+	}
+	permissions, err := svc.repository.FindPermissionsByRoleID(roleID)
+	if err != nil {
+		svc.logger.Error(err)
+		return NewCommonErrorSomethingWentWrong(dto.RoleDetailResponse{}, err)
+	}
+	codes := make([]string, 0, len(permissions))
+	items := make([]dto.PermissionItem, 0, len(permissions))
+	for _, p := range permissions {
+		codes = append(codes, p.CodeName)
+		items = append(items, dto.PermissionItem{ID: p.ID, CodeName: p.CodeName})
+	}
+	return dto.RoleDetailResponse{
+		ID:              role.ID,
+		Label:           role.Label,
+		Permissions:     codes,
+		PermissionItems: items,
+	}, nil
+}
+
+func (svc RolesService) UpdateRolePermissions(roleID uint32, req *dto.UpdateRolePermissionsRequest) (dto.RoleDetailResponse, error) {
+	if _, err := svc.repository.FindOneRoleByID(roleID); err != nil {
+		return dto.RoleDetailResponse{}, lib.CommonError{
+			StatusCode:    http.StatusNotFound,
+			ErrorCode:     constant.ErrCodeNotFound,
+			ErrorInstance: err,
+		}
+	}
+
+	uniqueIDs := map[uint32]struct{}{}
+	for _, id := range req.PermissionIDs {
+		uniqueIDs[id] = struct{}{}
+	}
+
+	for id := range uniqueIDs {
+		if _, err := svc.repository.FindOnePermissionByID(id); err != nil {
+			return dto.RoleDetailResponse{}, lib.CommonError{
+				StatusCode:    http.StatusBadRequest,
+				ErrorCode:     constant.ErrCodeBadRequest,
+				ErrorInstance: errors.New("invalid permission id"),
+			}
+		}
+	}
+
+	if err := svc.repository.DeleteRolePermissionsByRoleID(roleID); err != nil {
+		svc.logger.Error(err)
+		return NewCommonErrorSomethingWentWrong(dto.RoleDetailResponse{}, err)
+	}
+
+	for id := range uniqueIDs {
+		if _, err := svc.CreateRoleHasPermissions(roleID, id); err != nil {
+			return NewCommonErrorSomethingWentWrong(dto.RoleDetailResponse{}, err)
+		}
+	}
+	return svc.GetRoleByID(roleID)
 }
 
 func (svc RolesService) FindOneRoleByID(roleID uint32) (model.Role, error) {
@@ -121,5 +214,5 @@ func (svc RolesService) CreateRoleHasPermissions(createdRoleID uint32, permissio
 		svc.logger.Error(err)
 		return NewCommonErrorSomethingWentWrong(model.Role{}, err)
 	}
-	return svc.FindOneRoleByID(entity.ID)
+	return svc.FindOneRoleByID(createdRoleID)
 }

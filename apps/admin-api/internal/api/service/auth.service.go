@@ -7,12 +7,12 @@ import (
 
 	"github.com/dollarsignteam/go-logger"
 
-	"mini-api/helper"
-	"mini-api/internal/api/constant"
-	"mini-api/internal/api/dto"
-	"mini-api/internal/repository"
-	"mini-api/lib"
-	"mini-api/model"
+	"auzy-api/helper"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
+	"auzy-api/internal/repository"
+	"auzy-api/lib"
+	"auzy-api/model"
 )
 
 type AuthService struct {
@@ -34,7 +34,6 @@ func NewAuthService(
 }
 
 func (svc AuthService) Login(req *dto.LoginRequest, ip string) (dto.LoginResponse, error) {
-	// Sanitize username input
 	sanitizedUsername := helper.SanitizeUsername(req.Username)
 	if sanitizedUsername == "" || len(sanitizedUsername) < 3 {
 		return dto.LoginResponse{}, lib.CommonError{
@@ -43,7 +42,7 @@ func (svc AuthService) Login(req *dto.LoginRequest, ip string) (dto.LoginRespons
 			ErrorInstance: errors.New("invalid username format"),
 		}
 	}
-	
+
 	staff, err := svc.repository.FindOneStaffByUsername(sanitizedUsername)
 	if err != nil {
 		return dto.LoginResponse{}, lib.CommonError{
@@ -82,7 +81,7 @@ func (svc AuthService) LoginByStaff(staff model.Staff, ip string) (dto.LoginResp
 			ErrorInstance: err,
 		}
 	}
-	
+
 	refreshToken, err := svc.jwtHandler.CreateRefreshToken(subject)
 	if err != nil {
 		svc.logger.Error(GetStaffErrorMessage(staff.ID, err))
@@ -92,13 +91,15 @@ func (svc AuthService) LoginByStaff(staff model.Staff, ip string) (dto.LoginResp
 			ErrorInstance: err,
 		}
 	}
-	
-	session := dto.Session{
-		ID:           jwtToken.ID,
-		Username:     staff.Username,
-		StaffID:      staff.ID,
-		CreatedAt:    jwtToken.IssuedAt,
-		RefreshToken: refreshToken.Token,
+
+	session, err := svc.buildSession(staff, jwtToken.ID, jwtToken.IssuedAt, refreshToken.Token)
+	if err != nil {
+		svc.logger.Error(GetStaffErrorMessage(staff.ID, err))
+		return dto.LoginResponse{}, lib.CommonError{
+			StatusCode:    http.StatusUnauthorized,
+			ErrorCode:     constant.CodeCreateSessionFailed,
+			ErrorInstance: err,
+		}
 	}
 	if err := svc.repository.SetStaffSession(session); err != nil {
 		svc.logger.Error(GetStaffErrorMessage(staff.ID, err))
@@ -116,6 +117,34 @@ func (svc AuthService) LoginByStaff(staff model.Staff, ip string) (dto.LoginResp
 		Token:        jwtToken.Token,
 		RefreshToken: refreshToken.Token,
 		ExpiresIn:    jwtToken.ExpiresAt - jwtToken.IssuedAt,
+	}, nil
+}
+
+func (svc AuthService) buildSession(staff model.Staff, tokenID string, createdAt int64, refreshToken string) (dto.Session, error) {
+	roleLabel := ""
+	role, err := svc.repository.FindOneRoleByID(staff.RolesID)
+	if err == nil {
+		roleLabel = role.Label
+	}
+
+	permissions, err := svc.repository.FindPermissionCodeNamesByRoleID(staff.RolesID)
+	if err != nil {
+		permissions = []string{}
+	}
+	if permissions == nil {
+		permissions = []string{}
+	}
+
+	return dto.Session{
+		ID:           tokenID,
+		Username:     staff.Username,
+		StaffID:      staff.ID,
+		RoleID:       staff.RolesID,
+		RoleLabel:    roleLabel,
+		IsAdmin:      staff.IsAdmin,
+		Permissions:  permissions,
+		CreatedAt:    createdAt,
+		RefreshToken: refreshToken,
 	}, nil
 }
 
@@ -139,12 +168,10 @@ func (svc AuthService) RefreshToken(req *dto.RefreshTokenRequest) (dto.RefreshTo
 			ErrorInstance: errors.New("invalid refresh token"),
 		}
 	}
-	
-	// Get staff from subject
+
 	var staffID uint32
 	fmt.Sscanf(claims.Subject, "%d", &staffID)
-	
-	// Verify refresh token matches stored session
+
 	session, err := svc.repository.GetStaffSession(staffID)
 	if err != nil || session.RefreshToken != req.RefreshToken {
 		return dto.RefreshTokenResponse{}, lib.CommonError{
@@ -153,8 +180,7 @@ func (svc AuthService) RefreshToken(req *dto.RefreshTokenRequest) (dto.RefreshTo
 			ErrorInstance: errors.New("invalid or expired refresh token"),
 		}
 	}
-	
-	// Get staff
+
 	staff, err := svc.repository.FindOneStaffByID(staffID)
 	if err != nil {
 		return dto.RefreshTokenResponse{}, lib.CommonError{
@@ -163,7 +189,7 @@ func (svc AuthService) RefreshToken(req *dto.RefreshTokenRequest) (dto.RefreshTo
 			ErrorInstance: err,
 		}
 	}
-	
+
 	if !staff.IsActive || staff.DeletedAt != nil {
 		return dto.RefreshTokenResponse{}, lib.CommonError{
 			StatusCode:    http.StatusUnauthorized,
@@ -171,8 +197,7 @@ func (svc AuthService) RefreshToken(req *dto.RefreshTokenRequest) (dto.RefreshTo
 			ErrorInstance: errors.New("staff is inactive"),
 		}
 	}
-	
-	// Create new tokens
+
 	subject := fmt.Sprintf("%d", staff.ID)
 	newJWTToken, err := svc.jwtHandler.CreateToken(subject)
 	if err != nil {
@@ -182,7 +207,7 @@ func (svc AuthService) RefreshToken(req *dto.RefreshTokenRequest) (dto.RefreshTo
 			ErrorInstance: err,
 		}
 	}
-	
+
 	newRefreshToken, err := svc.jwtHandler.CreateRefreshToken(subject)
 	if err != nil {
 		return dto.RefreshTokenResponse{}, lib.CommonError{
@@ -191,20 +216,24 @@ func (svc AuthService) RefreshToken(req *dto.RefreshTokenRequest) (dto.RefreshTo
 			ErrorInstance: err,
 		}
 	}
-	
-	// Update session
-	session.ID = newJWTToken.ID
-	session.RefreshToken = newRefreshToken.Token
-	session.CreatedAt = newJWTToken.IssuedAt
-	
-	if err := svc.repository.SetStaffSession(session); err != nil {
+
+	updatedSession, err := svc.buildSession(staff, newJWTToken.ID, newJWTToken.IssuedAt, newRefreshToken.Token)
+	if err != nil {
 		return dto.RefreshTokenResponse{}, lib.CommonError{
 			StatusCode:    http.StatusUnauthorized,
 			ErrorCode:     constant.CodeCreateSessionFailed,
 			ErrorInstance: err,
 		}
 	}
-	
+
+	if err := svc.repository.SetStaffSession(updatedSession); err != nil {
+		return dto.RefreshTokenResponse{}, lib.CommonError{
+			StatusCode:    http.StatusUnauthorized,
+			ErrorCode:     constant.CodeCreateSessionFailed,
+			ErrorInstance: err,
+		}
+	}
+
 	return dto.RefreshTokenResponse{
 		Token:        newJWTToken.Token,
 		RefreshToken: newRefreshToken.Token,

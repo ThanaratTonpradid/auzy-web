@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"mini-api/helper"
+	"auzy-api/helper"
 )
 
 type SanitizeMiddleware struct{}

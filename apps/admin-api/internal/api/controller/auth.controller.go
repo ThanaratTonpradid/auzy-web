@@ -5,9 +5,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"mini-api/internal/api/constant"
-	"mini-api/internal/api/dto"
-	"mini-api/internal/api/service"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
+	"auzy-api/internal/api/service"
 )
 
 type AuthController struct {

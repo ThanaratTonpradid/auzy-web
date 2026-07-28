@@ -12,15 +12,15 @@ import (
 	"github.com/imroc/req/v3"
 	"go.uber.org/fx"
 
-	"mini-api/config"
-	"mini-api/internal/api/constant"
-	"mini-api/internal/api/controller"
-	"mini-api/internal/api/middleware"
-	"mini-api/internal/api/route"
-	"mini-api/internal/api/service"
-	"mini-api/internal/repository"
-	"mini-api/lib"
-	"mini-api/model"
+	"auzy-api/config"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/controller"
+	"auzy-api/internal/api/middleware"
+	"auzy-api/internal/api/route"
+	"auzy-api/internal/api/service"
+	"auzy-api/internal/repository"
+	"auzy-api/lib"
+	"auzy-api/model"
 )
 
 var Module = fx.Options(
@@ -46,7 +46,7 @@ var Module = fx.Options(
 func NewLoggerOptions(config *config.APIConfig) logger.LoggerOptions {
 	return logger.LoggerOptions{
 		Level: config.LogLevel,
-		Name:  "mini-api",
+		Name:  "auzy-api",
 	}
 }
 

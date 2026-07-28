@@ -1,4 +1,4 @@
-BINARY_FILE = mini-api
+BINARY_FILE = auzy-api
 
 clean:
 	@rm -rf $(BINARY_FILE) coverage.out

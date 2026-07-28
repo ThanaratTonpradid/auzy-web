@@ -3,7 +3,7 @@ package dto
 import (
 	"github.com/labstack/echo/v4"
 
-	"mini-api/lib"
+	"auzy-api/lib"
 )
 
 type IErrorResponse interface {

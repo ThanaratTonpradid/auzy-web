@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"mini-api/internal/api/constant"
-	"mini-api/internal/api/dto"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
 )
 
 func (h Handler) SetStaffSession(session dto.Session) error {

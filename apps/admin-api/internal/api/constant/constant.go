@@ -10,6 +10,8 @@ const (
 	ErrCodeSomethingWentWrong = "SOMETHING_WENT_WRONG"
 	ErrCodeBadRequest         = "BAD_REQUEST"
 	ErrCodeUnauthorized       = "UNAUTHORIZED"
+	ErrCodeForbidden          = "FORBIDDEN"
+	ErrCodeNotFound           = "NOT_FOUND"
 	ErrCodeInternalError      = "INTERNAL_ERROR"
 )
 

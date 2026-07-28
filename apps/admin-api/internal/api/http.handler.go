@@ -7,9 +7,9 @@ import (
 	"github.com/dollarsignteam/go-logger"
 	"github.com/labstack/echo/v4"
 
-	"mini-api/internal/api/constant"
-	"mini-api/internal/api/dto"
-	"mini-api/lib"
+	"auzy-api/internal/api/constant"
+	"auzy-api/internal/api/dto"
+	"auzy-api/lib"
 )
 
 func customHTTPErrorHandler(log *logger.Logger) func(error, echo.Context) {

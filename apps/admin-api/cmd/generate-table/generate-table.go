@@ -4,8 +4,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"mini-api/config"
-	"mini-api/model"
+	"auzy-api/config"
+	"auzy-api/model"
 )
 
 func main() {

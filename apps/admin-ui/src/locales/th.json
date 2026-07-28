@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Mini Admin",
+    "appName": "Auzy Admin",
     "loading": "กำลังโหลด...",
     "save": "บันทึก",
     "cancel": "ยกเลิก",
@@ -56,6 +56,33 @@
     "permissions": "สิทธิ์",
     "staff": "พนักงาน"
   },
+  "dashboard": {
+    "title": "แดชบอร์ด",
+    "welcome": "ยินดีต้อนรับ, {name}",
+    "permissionsCount": "สิทธิ์",
+    "quickLinks": "ทางลัด"
+  },
+  "staff": {
+    "title": "พนักงาน",
+    "subtitle": "จัดการบัญชีและสิทธิ์เข้าถึงของพนักงาน",
+    "create": "เพิ่มพนักงาน",
+    "edit": "แก้ไขพนักงาน",
+    "active": "ใช้งาน",
+    "admin": "แอดมิน",
+    "passwordHint": "เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน",
+    "createSuccess": "สร้างพนักงานสำเร็จ",
+    "updateSuccess": "อัปเดตพนักงานสำเร็จ",
+    "deleteSuccess": "ลบพนักงานสำเร็จ",
+    "deleteConfirmTitle": "ลบพนักงาน?",
+    "deleteConfirmMessage": "บัญชีนี้จะถูกปิดใช้งานและนำออกจากรายการ"
+  },
+  "roles": {
+    "title": "บทบาท",
+    "subtitle": "ดูบทบาทและกำหนดสิทธิ์",
+    "editPermissions": "แก้ไขสิทธิ์",
+    "noPermissions": "ยังไม่มีสิทธิ์",
+    "updateSuccess": "อัปเดตสิทธิ์ของบทบาทแล้ว"
+  },
   "profile": {
     "title": "โปรไฟล์",
     "editProfile": "แก้ไขโปรไฟล์",
@@ -72,4 +99,3 @@
     "changeLanguage": "เปลี่ยนภาษา"
   }
 }
-

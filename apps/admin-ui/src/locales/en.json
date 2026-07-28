@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Mini Admin",
+    "appName": "Auzy Admin",
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
@@ -56,6 +56,33 @@
     "permissions": "Permissions",
     "staff": "Staff"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {name}",
+    "permissionsCount": "Permissions",
+    "quickLinks": "Quick links"
+  },
+  "staff": {
+    "title": "Staff",
+    "subtitle": "Manage admin staff accounts and access",
+    "create": "Add staff",
+    "edit": "Edit staff",
+    "active": "Active",
+    "admin": "Admin",
+    "passwordHint": "Leave blank to keep current password",
+    "createSuccess": "Staff created successfully",
+    "updateSuccess": "Staff updated successfully",
+    "deleteSuccess": "Staff deleted successfully",
+    "deleteConfirmTitle": "Delete staff?",
+    "deleteConfirmMessage": "This staff account will be deactivated and removed from the list."
+  },
+  "roles": {
+    "title": "Roles",
+    "subtitle": "Review roles and assign permissions",
+    "editPermissions": "Edit permissions",
+    "noPermissions": "No permissions assigned",
+    "updateSuccess": "Role permissions updated"
+  },
   "profile": {
     "title": "Profile",
     "editProfile": "Edit Profile",
@@ -72,4 +99,3 @@
     "changeLanguage": "Change Language"
   }
 }
-

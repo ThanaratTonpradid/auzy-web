@@ -3,9 +3,9 @@ package route
 import (
 	"github.com/dollarsignteam/go-logger"
 
-	"mini-api/internal/api/controller"
-	"mini-api/internal/api/middleware"
-	"mini-api/lib"
+	"auzy-api/internal/api/controller"
+	"auzy-api/internal/api/middleware"
+	"auzy-api/lib"
 )
 
 type AuthRoute struct {

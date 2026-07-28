@@ -56,11 +56,7 @@ describe('Auth Service', () => {
 
       const result = await logoutService();
 
-      expect(axiosInstance.post).toHaveBeenCalledWith(
-        '/api/auth/logout',
-        {},
-        expect.any(Object)
-      );
+      expect(axiosInstance.post).toHaveBeenCalledWith('/api/auth/logout');
       expect(result).toEqual(mockResponse.data);
     });
 

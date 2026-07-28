@@ -1,6 +1,6 @@
 package main
 
-import "mini-api/cmd"
+import "auzy-api/cmd"
 
 func main() {
 	cmd.Execute()
