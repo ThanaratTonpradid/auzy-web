@@ -116,6 +116,18 @@
     "longitude": "Longitude",
     "source": "Geo source"
   },
+  "locationPage": {
+    "eyebrow": "Your connection",
+    "title": "IP location",
+    "subtitle": "Estimated location based on the IP address used to open this page.",
+    "loading": "Looking up your location…",
+    "unavailable": "Location unavailable",
+    "refresh": "Refresh",
+    "goHome": "Back home",
+    "maps": "Open in maps",
+    "ip": "IP address",
+    "summary": "Summary"
+  },
   "profile": {
     "title": "Profile",
     "editProfile": "Edit Profile",

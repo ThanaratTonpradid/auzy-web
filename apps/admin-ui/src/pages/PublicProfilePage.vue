@@ -14,6 +14,10 @@ const profile = {
     'A quiet corner of the internet. Thanks for stopping by.',
   links: [
     {
+      label: 'Location',
+      name: 'location',
+    },
+    {
       label: 'Admin',
       name: 'login',
     },

@@ -13,3 +13,8 @@ export async function listVisitorLogsService({ page = 1, limit = 20 } = {}) {
   });
   return res.data;
 }
+
+export async function getPublicLocationService() {
+  const res = await axiosInstance.get('/api/public/location');
+  return res.data;
+}

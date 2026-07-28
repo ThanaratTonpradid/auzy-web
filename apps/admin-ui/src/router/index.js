@@ -7,6 +7,7 @@ import { rolesRoute } from './roles.route';
 import { publicProfileRoute } from './public-profile.route';
 import { visitorLogsRoute } from './visitor-logs.route';
 import { catchAllRoute, notFoundRoute, priCatchAllRoute, pubCatchAllRoute } from './not-found.route';
+import { locationRoute } from './location.route';
 import { routerHook } from './router-hook';
 
 const router = createRouter({
@@ -16,6 +17,12 @@ const router = createRouter({
       path: '/',
       component: () => import('../layouts/PublicLayout.vue'),
       children: [publicProfileRoute],
+      meta: { requiresAuth: false },
+    },
+    {
+      path: '/location',
+      component: () => import('../layouts/PublicLayout.vue'),
+      children: [locationRoute],
       meta: { requiresAuth: false },
     },
     {

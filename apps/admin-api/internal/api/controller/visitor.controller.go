@@ -58,3 +58,13 @@ func (ctrl VisitorController) ListVisitorLogs(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, resp)
 }
+
+//	@Tags		Public
+//	@Summary	Lookup location for the current client IP
+//	@Produce	json
+//	@Success	200	{object}	dto.PublicLocationResponse
+//	@Router		/api/public/location [get]
+func (ctrl VisitorController) GetPublicLocation(c echo.Context) error {
+	ip := c.RealIP()
+	return c.JSON(http.StatusOK, ctrl.visitorService.LookupClientLocation(ip))
+}

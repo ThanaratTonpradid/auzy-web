@@ -111,6 +111,40 @@ func (svc VisitorService) ListVisits(page, limit int) (dto.VisitorLogListRespons
 	}, nil
 }
 
+func (svc VisitorService) LookupClientLocation(ip string) dto.PublicLocationResponse {
+	resp := dto.PublicLocationResponse{
+		IP:        ip,
+		Available: false,
+	}
+
+	geo, err := svc.geoIPService.Lookup(ip)
+	if err != nil {
+		resp.Message = "Unable to resolve location for this IP"
+		return resp
+	}
+	if geo == nil {
+		resp.Message = "Location is unavailable for local or private IP addresses"
+		return resp
+	}
+
+	meta := &model.LocationMetadata{
+		Country: geo.Country,
+		Region:  geo.Region,
+		City:    geo.City,
+		Source:  "ip-api",
+	}
+	if geo.Latitude != 0 || geo.Longitude != 0 {
+		lat := geo.Latitude
+		lon := geo.Longitude
+		meta.Latitude = &lat
+		meta.Longitude = &lon
+	}
+
+	resp.Available = true
+	resp.Metadata = meta
+	return resp
+}
+
 func truncate(value string, max int) string {
 	if len(value) <= max {
 		return value

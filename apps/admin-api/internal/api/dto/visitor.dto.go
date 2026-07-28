@@ -24,4 +24,11 @@ type (
 		Page  int              `json:"page"`
 		Limit int              `json:"limit"`
 	}
+
+	PublicLocationResponse struct {
+		IP        string                  `json:"ip"`
+		Available bool                    `json:"available"`
+		Message   string                  `json:"message,omitempty"`
+		Metadata  *model.LocationMetadata `json:"metadata"`
+	}
 )

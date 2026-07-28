@@ -46,6 +46,11 @@ func (r VisitorRoute) Setup() {
 		r.rateLimitMiddleware.RateLimitByIP(),
 	)
 	api.GET(
+		"/public/location",
+		r.ctrl.GetPublicLocation,
+		r.rateLimitMiddleware.RateLimitByIP(),
+	)
+	api.GET(
 		"/visitor-logs",
 		r.ctrl.ListVisitorLogs,
 		r.jwtAuthMiddleware.JWTAuth(),
