@@ -50,6 +50,11 @@
     "networkError": "Network error. Please check your connection.",
     "unknownError": "An unexpected error occurred."
   },
+  "notFound": {
+    "title": "Page not found",
+    "message": "This path does not exist. Check the URL or go back home.",
+    "goHome": "Go home"
+  },
   "menu": {
     "dashboard": "Dashboard",
     "profile": "Profile",
