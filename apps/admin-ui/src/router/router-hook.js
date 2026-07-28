@@ -2,7 +2,7 @@ import { ConfigName } from '../constants';
 import { useAuthStore } from '../stores/auth';
 import { useStaffStore } from '../stores/staff';
 
-export const routerHook = async (to, from, next) => {
+export const routerHook = async (to) => {
   const authStore = useAuthStore();
   const staffStore = useStaffStore();
 
@@ -12,31 +12,26 @@ export const routerHook = async (to, from, next) => {
 
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
-      next({ name: 'login' });
-      return;
+      return { name: 'login' };
     }
 
     if (!staffStore.profile?.id) {
       const ok = await authStore.bootstrapAuth();
       if (!ok) {
-        next({ name: 'login' });
-        return;
+        return { name: 'login' };
       }
     }
 
     if (to.meta.permission && !staffStore.hasPermission(to.meta.permission)) {
-      next({ name: 'dashboard' });
-      return;
+      return { name: 'dashboard' };
     }
 
-    next();
-    return;
+    return true;
   }
 
   if (isAuthenticated && to.name === 'login') {
-    next({ name: 'dashboard' });
-    return;
+    return { name: 'dashboard' };
   }
 
-  next();
+  return true;
 };
