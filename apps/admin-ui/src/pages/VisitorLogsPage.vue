@@ -56,38 +56,42 @@ onMounted(load);
 </script>
 
 <template>
-  <v-container>
-    <div class="mb-4">
-      <h1 class="text-h4">{{ $t('visitors.title') }}</h1>
-      <p class="text-body-2 text-medium-emphasis">{{ $t('visitors.subtitle') }}</p>
-    </div>
+  <div class="page-shell">
+    <header class="page-header">
+      <p class="page-header__eyebrow">{{ $t('common.appName') }}</p>
+      <h1 class="page-header__title">{{ $t('visitors.title') }}</h1>
+      <p class="page-header__subtitle">{{ $t('visitors.subtitle') }}</p>
+    </header>
 
-    <v-data-table
-      :headers="headers"
-      :items="items"
-      item-value="id"
-      class="elevation-0"
-      border
-      :items-per-page="limit"
-      hide-default-footer
-    >
-      <template #[`item.createdAt`]="{ item }">
-        {{ item.createdAtLabel }}
-      </template>
-      <template #[`item.userAgent`]="{ item }">
-        <span class="text-truncate d-inline-block" style="max-width: 280px">
-          {{ item.userAgent || '-' }}
-        </span>
-      </template>
-    </v-data-table>
+    <section class="surface-panel quiet-table overflow-hidden">
+      <v-data-table
+        :headers="headers"
+        :items="items"
+        item-value="id"
+        class="bg-transparent"
+        :items-per-page="limit"
+        hide-default-footer
+      >
+        <template #[`item.createdAt`]="{ item }">
+          {{ item.createdAtLabel }}
+        </template>
+        <template #[`item.userAgent`]="{ item }">
+          <span class="ua-cell">
+            {{ item.userAgent || '-' }}
+          </span>
+        </template>
+      </v-data-table>
+    </section>
 
-    <div class="d-flex align-center justify-space-between mt-4">
-      <div class="text-body-2 text-medium-emphasis">
+    <div class="visitors-footer">
+      <div class="visitors-footer__total">
         {{ $t('visitors.total', { count: total }) }}
       </div>
-      <div class="d-flex ga-2">
+      <div class="visitors-footer__pager">
         <v-btn
           variant="tonal"
+          color="primary"
+          rounded="lg"
           :disabled="page <= 1"
           @click="onPageChange(page - 1)"
         >
@@ -95,6 +99,8 @@ onMounted(load);
         </v-btn>
         <v-btn
           variant="tonal"
+          color="primary"
+          rounded="lg"
           :disabled="page * limit >= total"
           @click="onPageChange(page + 1)"
         >
@@ -102,5 +108,41 @@ onMounted(load);
         </v-btn>
       </div>
     </div>
-  </v-container>
+  </div>
 </template>
+
+<style scoped>
+.ua-cell {
+  display: inline-block;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.visitors-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.visitors-footer__total {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.visitors-footer__pager {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .visitors-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>

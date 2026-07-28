@@ -5,14 +5,14 @@ import AppBar from '../components/AppBar.vue';
 <template>
   <div class="private-layout">
     <AppBar />
-    <v-main>
-      <v-container class="pa-0" fluid>
-        <v-row no-gutters>
-          <v-col>
-            <RouterView />
-          </v-col>
-        </v-row>
-      </v-container>
+    <v-main class="private-layout__main">
+      <RouterView />
     </v-main>
   </div>
 </template>
+
+<style scoped>
+.private-layout__main {
+  min-height: 100vh;
+}
+</style>

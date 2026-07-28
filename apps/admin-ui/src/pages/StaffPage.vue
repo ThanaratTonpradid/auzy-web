@@ -128,50 +128,59 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container>
-    <div class="d-flex align-center justify-space-between mb-4">
+  <div class="page-shell">
+    <header class="page-header page-header--row">
       <div>
-        <h1 class="text-h4">{{ $t('staff.title') }}</h1>
-        <p class="text-body-2 text-medium-emphasis">{{ $t('staff.subtitle') }}</p>
+        <p class="page-header__eyebrow">{{ $t('common.appName') }}</p>
+        <h1 class="page-header__title">{{ $t('staff.title') }}</h1>
+        <p class="page-header__subtitle">{{ $t('staff.subtitle') }}</p>
       </div>
-      <v-btn v-if="canCreate" color="primary" prepend-icon="mdi-plus" @click="openCreate">
+      <v-btn
+        v-if="canCreate"
+        color="primary"
+        rounded="lg"
+        prepend-icon="mdi-plus"
+        @click="openCreate"
+      >
         {{ $t('staff.create') }}
       </v-btn>
-    </div>
+    </header>
 
-    <v-data-table :headers="headers" :items="items" item-value="id" class="elevation-0" border>
-      <template #[`item.isActive`]="{ item }">
-        <v-chip size="small" :color="item.isActive ? 'success' : 'default'" variant="tonal">
-          {{ item.isActive ? $t('common.yes') : $t('common.no') }}
-        </v-chip>
-      </template>
-      <template #[`item.isAdmin`]="{ item }">
-        <v-chip size="small" :color="item.isAdmin ? 'primary' : 'default'" variant="tonal">
-          {{ item.isAdmin ? $t('common.yes') : $t('common.no') }}
-        </v-chip>
-      </template>
-      <template #[`item.actions`]="{ item }">
-        <v-btn
-          v-if="canUpdate"
-          icon="mdi-pencil"
-          variant="text"
-          size="small"
-          @click="openEdit(item)"
-        />
-        <v-btn
-          v-if="canDelete"
-          icon="mdi-delete"
-          variant="text"
-          size="small"
-          color="error"
-          @click="openDelete(item)"
-        />
-      </template>
-    </v-data-table>
+    <section class="surface-panel quiet-table overflow-hidden">
+      <v-data-table :headers="headers" :items="items" item-value="id" class="bg-transparent">
+        <template #[`item.isActive`]="{ item }">
+          <v-chip size="small" :color="item.isActive ? 'success' : 'default'" variant="tonal">
+            {{ item.isActive ? $t('common.yes') : $t('common.no') }}
+          </v-chip>
+        </template>
+        <template #[`item.isAdmin`]="{ item }">
+          <v-chip size="small" :color="item.isAdmin ? 'primary' : 'default'" variant="tonal">
+            {{ item.isAdmin ? $t('common.yes') : $t('common.no') }}
+          </v-chip>
+        </template>
+        <template #[`item.actions`]="{ item }">
+          <v-btn
+            v-if="canUpdate"
+            icon="mdi-pencil"
+            variant="text"
+            size="small"
+            @click="openEdit(item)"
+          />
+          <v-btn
+            v-if="canDelete"
+            icon="mdi-delete"
+            variant="text"
+            size="small"
+            color="error"
+            @click="openDelete(item)"
+          />
+        </template>
+      </v-data-table>
+    </section>
 
     <v-dialog v-model="dialog" max-width="520">
-      <v-card>
-        <v-card-title>
+      <v-card rounded="xl" class="surface-dialog">
+        <v-card-title class="text-h6">
           {{ editingId ? $t('staff.edit') : $t('staff.create') }}
         </v-card-title>
         <v-card-text>
@@ -183,7 +192,8 @@ onMounted(async () => {
             :label="$t('auth.username')"
             :disabled="!!editingId"
             variant="outlined"
-            density="compact"
+            density="comfortable"
+            rounded="lg"
             class="mb-2"
           />
           <v-text-field
@@ -193,14 +203,16 @@ onMounted(async () => {
             :hint="editingId ? $t('staff.passwordHint') : ''"
             persistent-hint
             variant="outlined"
-            density="compact"
+            density="comfortable"
+            rounded="lg"
             class="mb-2"
           />
           <v-text-field
             v-model="form.fullname"
             :label="$t('profile.fullname')"
             variant="outlined"
-            density="compact"
+            density="comfortable"
+            rounded="lg"
             class="mb-2"
           />
           <v-select
@@ -208,30 +220,47 @@ onMounted(async () => {
             :items="roleOptions"
             :label="$t('menu.roles')"
             variant="outlined"
-            density="compact"
+            density="comfortable"
+            rounded="lg"
             class="mb-2"
           />
           <v-switch v-model="form.isActive" :label="$t('staff.active')" color="primary" hide-details />
           <v-switch v-model="form.isAdmin" :label="$t('staff.admin')" color="primary" hide-details />
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="pa-4">
           <v-spacer />
           <v-btn variant="text" @click="dialog = false">{{ $t('common.cancel') }}</v-btn>
-          <v-btn color="primary" @click="submitForm">{{ $t('common.save') }}</v-btn>
+          <v-btn color="primary" rounded="lg" @click="submitForm">{{ $t('common.save') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="deleteDialog" max-width="400">
-      <v-card>
+      <v-card rounded="xl">
         <v-card-title>{{ $t('staff.deleteConfirmTitle') }}</v-card-title>
         <v-card-text>{{ $t('staff.deleteConfirmMessage') }}</v-card-text>
-        <v-card-actions>
+        <v-card-actions class="pa-4">
           <v-spacer />
           <v-btn variant="text" @click="deleteDialog = false">{{ $t('common.cancel') }}</v-btn>
-          <v-btn color="error" @click="confirmDelete">{{ $t('common.delete') }}</v-btn>
+          <v-btn color="error" rounded="lg" @click="confirmDelete">{{ $t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-container>
+  </div>
 </template>
+
+<style scoped>
+.page-header--row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (max-width: 720px) {
+  .page-header--row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>

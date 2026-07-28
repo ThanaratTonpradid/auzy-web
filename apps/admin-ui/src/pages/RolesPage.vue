@@ -49,50 +49,53 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container>
-    <div class="mb-4">
-      <h1 class="text-h4">{{ $t('roles.title') }}</h1>
-      <p class="text-body-2 text-medium-emphasis">{{ $t('roles.subtitle') }}</p>
+  <div class="page-shell">
+    <header class="page-header">
+      <p class="page-header__eyebrow">{{ $t('common.appName') }}</p>
+      <h1 class="page-header__title">{{ $t('roles.title') }}</h1>
+      <p class="page-header__subtitle">{{ $t('roles.subtitle') }}</p>
+    </header>
+
+    <div class="roles-grid">
+      <section v-for="role in items" :key="role.id" class="surface-panel surface-panel--pad role-card">
+        <div class="role-card__head">
+          <div>
+            <h2 class="role-card__title">{{ role.label }}</h2>
+            <p class="role-card__id">ID {{ role.id }}</p>
+          </div>
+          <v-btn
+            v-if="canUpdate"
+            size="small"
+            variant="tonal"
+            color="primary"
+            rounded="lg"
+            prepend-icon="mdi-shield-edit-outline"
+            @click="openEdit(role)"
+          >
+            {{ $t('roles.editPermissions') }}
+          </v-btn>
+        </div>
+        <div class="role-card__perms">
+          <span
+            v-for="code in role.permissions"
+            :key="code"
+            class="meta-chip"
+          >
+            {{ code }}
+          </span>
+          <span
+            v-if="!(role.permissions || []).length"
+            class="role-card__empty"
+          >
+            {{ $t('roles.noPermissions') }}
+          </span>
+        </div>
+      </section>
     </div>
 
-    <v-row>
-      <v-col v-for="role in items" :key="role.id" cols="12" md="4">
-        <v-sheet border rounded class="pa-4 h-100">
-          <div class="d-flex align-center justify-space-between mb-3">
-            <div>
-              <div class="text-h6">{{ role.label }}</div>
-              <div class="text-caption text-medium-emphasis">ID: {{ role.id }}</div>
-            </div>
-            <v-btn
-              v-if="canUpdate"
-              size="small"
-              variant="tonal"
-              prepend-icon="mdi-shield-edit"
-              @click="openEdit(role)"
-            >
-              {{ $t('roles.editPermissions') }}
-            </v-btn>
-          </div>
-          <div class="d-flex flex-wrap ga-2">
-            <v-chip
-              v-for="code in role.permissions"
-              :key="code"
-              size="small"
-              variant="outlined"
-            >
-              {{ code }}
-            </v-chip>
-            <span v-if="!(role.permissions || []).length" class="text-body-2 text-medium-emphasis">
-              {{ $t('roles.noPermissions') }}
-            </span>
-          </div>
-        </v-sheet>
-      </v-col>
-    </v-row>
-
     <v-dialog v-model="dialog" max-width="560">
-      <v-card>
-        <v-card-title>
+      <v-card rounded="xl">
+        <v-card-title class="text-h6">
           {{ $t('roles.editPermissions') }} — {{ editingRole?.label }}
         </v-card-title>
         <v-card-text>
@@ -109,15 +112,86 @@ onMounted(async () => {
             chips
             closable-chips
             variant="outlined"
-            density="compact"
+            density="comfortable"
+            rounded="lg"
           />
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="pa-4">
           <v-spacer />
           <v-btn variant="text" @click="dialog = false">{{ $t('common.cancel') }}</v-btn>
-          <v-btn color="primary" @click="savePermissions">{{ $t('common.save') }}</v-btn>
+          <v-btn color="primary" rounded="lg" @click="savePermissions">
+            {{ $t('common.save') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-container>
+  </div>
 </template>
+
+<style scoped>
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.role-card {
+  display: grid;
+  gap: 1rem;
+  min-height: 100%;
+  transition:
+    transform var(--motion),
+    border-color var(--motion);
+}
+
+.role-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(31, 122, 102, 0.28);
+}
+
+.role-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.role-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.role-card__id {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.role-card__perms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.role-card__empty {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1100px) {
+  .roles-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-card__head {
+    flex-direction: column;
+  }
+}
+</style>

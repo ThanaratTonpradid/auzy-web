@@ -1,25 +1,46 @@
-/* Base styles */
-* {
+:root {
+  --font-thai: 'Prompt', 'Sora', sans-serif;
+  --font-en: 'Sora', 'Prompt', sans-serif;
+  --ink: #12201c;
+  --ink-soft: #3d524a;
+  --mist: #eef3f0;
+  --paper: #f7faf8;
+  --line: rgba(18, 32, 28, 0.1);
+  --accent: #1f7a66;
+  --accent-soft: #d8efe8;
+  --warn: #b45309;
+  --danger: #b42318;
+  --shadow-soft: 0 18px 50px rgba(18, 32, 28, 0.08);
+  --radius: 18px;
+  --motion: 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-:root {
-  /* Font families */
-  --font-thai: 'Sukhumvit Set', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-en: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+html,
+body,
+#app {
+  min-height: 100%;
 }
 
-/* Smooth font rendering */
 body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(31, 122, 102, 0.12), transparent 36%),
+    radial-gradient(circle at 100% 0%, rgba(18, 32, 28, 0.06), transparent 28%),
+    linear-gradient(165deg, #f4f7f5 0%, #e9efec 55%, #e4ebe7 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Override Vuetify's Roboto font - Thai as default */
 .v-application,
 .v-application .v-btn,
-.v-application .v-card,
 .v-application .v-list,
 .v-application .v-toolbar,
 .v-application .v-app-bar,
@@ -27,24 +48,111 @@ body {
 .v-application .v-text-field,
 .v-application input,
 .v-application textarea,
-.v-application button,
-.v-application * {
+.v-application button {
   font-family: var(--font-thai) !important;
 }
 
-/* English font when lang="en" */
-html[lang="en"] .v-application,
-html[lang="en"] .v-application .v-btn,
-html[lang="en"] .v-application .v-card,
-html[lang="en"] .v-application .v-list,
-html[lang="en"] .v-application .v-toolbar,
-html[lang="en"] .v-application .v-app-bar,
-html[lang="en"] .v-application .v-navigation-drawer,
-html[lang="en"] .v-application .v-text-field,
-html[lang="en"] .v-application input,
-html[lang="en"] .v-application textarea,
-html[lang="en"] .v-application button,
-html[lang="en"] .v-application * {
+html[lang='en'] .v-application,
+html[lang='en'] .v-application .v-btn,
+html[lang='en'] .v-application .v-list,
+html[lang='en'] .v-application .v-toolbar,
+html[lang='en'] .v-application .v-app-bar,
+html[lang='en'] .v-application .v-navigation-drawer,
+html[lang='en'] .v-application .v-text-field,
+html[lang='en'] .v-application input,
+html[lang='en'] .v-application textarea,
+html[lang='en'] .v-application button {
   font-family: var(--font-en) !important;
 }
 
+.v-application {
+  background: transparent !important;
+}
+
+.page-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 2.5rem;
+  animation: page-in 480ms var(--motion) both;
+}
+
+.page-header {
+  margin-bottom: 1.75rem;
+}
+
+.page-header__eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.page-header__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.page-header__subtitle {
+  margin: 0.55rem 0 0;
+  max-width: 42rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.surface-panel {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-panel--pad {
+  padding: 1.25rem 1.35rem;
+}
+
+.quiet-table .v-table {
+  background: transparent !important;
+}
+
+.quiet-table th {
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft) !important;
+  font-weight: 600 !important;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .page-shell {
+    width: min(100%, calc(100% - 1.25rem));
+    padding-top: 1rem;
+  }
+}
