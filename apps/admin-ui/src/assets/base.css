@@ -1,0 +1,50 @@
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Font families */
+  --font-thai: 'Sukhumvit Set', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-en: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Smooth font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Override Vuetify's Roboto font - Thai as default */
+.v-application,
+.v-application .v-btn,
+.v-application .v-card,
+.v-application .v-list,
+.v-application .v-toolbar,
+.v-application .v-app-bar,
+.v-application .v-navigation-drawer,
+.v-application .v-text-field,
+.v-application input,
+.v-application textarea,
+.v-application button,
+.v-application * {
+  font-family: var(--font-thai) !important;
+}
+
+/* English font when lang="en" */
+html[lang="en"] .v-application,
+html[lang="en"] .v-application .v-btn,
+html[lang="en"] .v-application .v-card,
+html[lang="en"] .v-application .v-list,
+html[lang="en"] .v-application .v-toolbar,
+html[lang="en"] .v-application .v-app-bar,
+html[lang="en"] .v-application .v-navigation-drawer,
+html[lang="en"] .v-application .v-text-field,
+html[lang="en"] .v-application input,
+html[lang="en"] .v-application textarea,
+html[lang="en"] .v-application button,
+html[lang="en"] .v-application * {
+  font-family: var(--font-en) !important;
+}
+

@@ -1,0 +1,19 @@
+{
+  "name": "auzy-web",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev:ui": "pnpm --filter app dev",
+    "build:ui": "pnpm --filter app build",
+    "lint:ui": "pnpm --filter app lint",
+    "test:ui": "pnpm --filter app test:unit",
+    "dev:api": "make -C apps/admin-api api",
+    "build:api": "make -C apps/admin-api build",
+    "infra:up": "make -C apps/admin-api infra-up",
+    "infra:down": "make -C apps/admin-api infra-down"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=18"
+  }
+}

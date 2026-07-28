@@ -1,0 +1,51 @@
+# OS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# Editor
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/*
+!.vscode/extensions.json
+
+# Env / secrets
+*.env*
+!*.env.sample
+*.local
+
+# Node / frontend
+node_modules
+dist
+dist-ssr
+coverage
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Go / backend
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+main
+mini-api
+apps/admin-api/.development/data*
+
+# Cypress
+**/cypress/videos/
+**/cypress/screenshots/

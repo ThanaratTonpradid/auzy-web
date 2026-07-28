@@ -1,0 +1,36 @@
+# Binaries
+mini-api
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+*.out
+
+# Development files
+.development/
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Data directories
+data/
+
+# Documentation
+README.md
+*.md
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go specific
+vendor/
+coverage.out
+

@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: mini
+      MYSQL_PASSWORD: mini
+      MYSQL_DATABASE: mini
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "1323:1323"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - PORT=1323
+      - LOG_LEVEL=debug
+      - MYSQL_DSN=mini:mini@tcp(mysql:3306)/mini?charset=utf8mb4&parseTime=True&loc=Local
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=kdG8ohxSu51m3gVc
+      - AUTH_TOKEN=aa111111
+      - INIT_DATA=true
+      - DEFAULT_DEV_PASSWORD=Aa111111!
