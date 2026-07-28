@@ -25,7 +25,7 @@ func NewVisitorController(
 //	@Summary	Record a public profile visit
 //	@Accept		json
 //	@Produce	json
-//	@Param		data	body		dto.RecordVisitRequest	false	"Visit payload"
+//	@Param		data	body	dto.RecordVisitRequest	false	"Visit payload"
 //	@Success	204		"No Content"
 //	@Router		/api/public/visit [post]
 func (ctrl VisitorController) RecordVisit(c echo.Context) error {

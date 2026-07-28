@@ -45,10 +45,10 @@ func (ctrl AuthController) Login(c echo.Context) error {
 //	@Tags		Auth
 //	@Summary	Refresh access token using refresh token
 //	@Produce	json
-//	@Param		data	body		dto.RefreshTokenRequest			true	"Request payload"
-//	@Success	200		{object}	dto.RefreshTokenResponse		"OK"
-//	@Failure	400		{object}	dto.ErrorValidationResponse		"Bad Request"
-//	@Failure	401		{object}	dto.ErrorResponse				"Unauthorized"
+//	@Param		data	body		dto.RefreshTokenRequest		true	"Request payload"
+//	@Success	200		{object}	dto.RefreshTokenResponse	"OK"
+//	@Failure	400		{object}	dto.ErrorValidationResponse	"Bad Request"
+//	@Failure	401		{object}	dto.ErrorResponse			"Unauthorized"
 //	@Router		/api/auth/refresh [post]
 func (ctrl AuthController) RefreshToken(c echo.Context) error {
 	req := new(dto.RefreshTokenRequest)
