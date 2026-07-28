@@ -17,7 +17,12 @@
     "yes": "ใช่",
     "no": "ไม่ใช่",
     "ok": "ตกลง",
-    "noData": "ยังไม่มีข้อมูล"
+    "noData": "ยังไม่มีข้อมูล",
+    "actions": "จัดการ",
+    "details": "รายละเอียด",
+    "itemsPerPage": "ต่อหน้า",
+    "pageOf": "หน้า {page} จาก {total}",
+    "totalCount": "ทั้งหมด {count} รายการ"
   },
   "auth": {
     "login": "เข้าสู่ระบบ",
@@ -100,8 +105,16 @@
     "location": "ตำแหน่ง",
     "path": "พาธ",
     "userAgent": "User agent",
+    "referer": "Referer",
     "createdAt": "เวลา",
-    "total": "ทั้งหมด {count} ครั้ง"
+    "total": "ทั้งหมด {count} ครั้ง",
+    "detailTitle": "รายละเอียดการเข้าชม",
+    "country": "ประเทศ",
+    "region": "ภูมิภาค",
+    "city": "เมือง",
+    "latitude": "ละติจูด",
+    "longitude": "ลองจิจูด",
+    "source": "แหล่งพิกัด"
   },
   "profile": {
     "title": "โปรไฟล์",

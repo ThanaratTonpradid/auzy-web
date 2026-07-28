@@ -1,25 +1,64 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useDisplay } from 'vuetify';
+import { useI18n } from 'vue-i18n';
 import { listVisitorLogsService } from '../services/visitor';
 import { useAppStore } from '../stores/app';
-import { i18n } from '../plugins/i18n';
+import { useServerTablePagination } from '../composables/useTablePagination';
+import AdminDataTable from '../components/AdminDataTable.vue';
+import TablePagination from '../components/TablePagination.vue';
 
 const appStore = useAppStore();
 const { mdAndUp } = useDisplay();
+const { t } = useI18n();
+
 const items = ref([]);
-const total = ref(0);
-const page = ref(1);
-const limit = ref(20);
+const detailOpen = ref(false);
+const selected = ref(null);
+
+const pagination = {};
+
+const load = async () => {
+  try {
+    appStore.setLoading(true);
+    const res = await listVisitorLogsService({
+      page: pagination.page.value,
+      limit: pagination.limit.value,
+    });
+    items.value = (res.items || []).map((item) => ({
+      ...item,
+      location: formatLocation(item),
+      createdAtLabel: formatTime(item.createdAt),
+    }));
+    pagination.syncTotal(res.total || 0);
+  } catch (error) {
+    appStore.setError(error.message || t('error.unknownError'));
+  } finally {
+    appStore.setLoading(false);
+  }
+};
+
+Object.assign(pagination, useServerTablePagination({ load }));
+const { page, limit, total } = pagination;
 
 const headers = computed(() => [
   { title: 'ID', key: 'id', width: 80 },
-  { title: i18n.global.t('visitors.ip'), key: 'ip' },
-  { title: i18n.global.t('visitors.location'), key: 'location', sortable: false },
-  { title: i18n.global.t('visitors.path'), key: 'path' },
-  { title: i18n.global.t('visitors.userAgent'), key: 'userAgent' },
-  { title: i18n.global.t('visitors.createdAt'), key: 'createdAt' },
+  { title: t('visitors.ip'), key: 'ip' },
+  { title: t('visitors.location'), key: 'location', sortable: false },
+  { title: t('visitors.path'), key: 'path' },
+  { title: t('visitors.userAgent'), key: 'userAgent' },
+  { title: t('visitors.createdAt'), key: 'createdAt' },
+  {
+    title: t('common.actions'),
+    key: 'actions',
+    sortable: false,
+    align: 'end',
+    width: 120,
+  },
 ]);
+
+const selectedMeta = computed(() => selected.value?.metadata || {});
+const totalText = computed(() => t('visitors.total', { count: total.value }));
 
 const formatLocation = (item) => {
   const meta = item.metadata || {};
@@ -32,26 +71,21 @@ const formatTime = (unix) => {
   return new Date(unix * 1000).toLocaleString();
 };
 
-const load = async () => {
-  try {
-    appStore.setLoading(true);
-    const res = await listVisitorLogsService({ page: page.value, limit: limit.value });
-    items.value = (res.items || []).map((item) => ({
-      ...item,
-      location: formatLocation(item),
-      createdAtLabel: formatTime(item.createdAt),
-    }));
-    total.value = res.total || 0;
-  } catch (error) {
-    appStore.setError(error.message || i18n.global.t('error.unknownError'));
-  } finally {
-    appStore.setLoading(false);
+const formatCoord = (value) => {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return '-';
   }
+  return Number(value).toFixed(5);
 };
 
-const onPageChange = async (nextPage) => {
-  page.value = nextPage;
-  await load();
+const openDetails = (item) => {
+  selected.value = item;
+  detailOpen.value = true;
+};
+
+const closeDetails = () => {
+  detailOpen.value = false;
+  selected.value = null;
 };
 
 onMounted(load);
@@ -65,25 +99,33 @@ onMounted(load);
       <p class="page-header__subtitle">{{ $t('visitors.subtitle') }}</p>
     </header>
 
-    <section v-if="mdAndUp" class="surface-panel quiet-table overflow-hidden">
-      <v-data-table
-        :headers="headers"
-        :items="items"
-        item-value="id"
-        class="bg-transparent"
-        :items-per-page="limit"
-        hide-default-footer
-      >
-        <template #[`item.createdAt`]="{ item }">
-          {{ item.createdAtLabel }}
-        </template>
-        <template #[`item.userAgent`]="{ item }">
-          <span class="ua-cell">
-            {{ item.userAgent || '-' }}
-          </span>
-        </template>
-      </v-data-table>
-    </section>
+    <AdminDataTable
+      v-if="mdAndUp"
+      :headers="headers"
+      :items="items"
+      :items-per-page="limit"
+    >
+      <template #[`item.createdAt`]="{ item }">
+        {{ item.createdAtLabel }}
+      </template>
+      <template #[`item.userAgent`]="{ item }">
+        <span class="ua-cell">
+          {{ item.userAgent || '-' }}
+        </span>
+      </template>
+      <template #[`item.actions`]="{ item }">
+        <v-btn
+          size="small"
+          variant="tonal"
+          color="primary"
+          rounded="lg"
+          prepend-icon="mdi-eye-outline"
+          @click="openDetails(item)"
+        >
+          {{ $t('common.details') }}
+        </v-btn>
+      </template>
+    </AdminDataTable>
 
     <section v-else class="mobile-list">
       <article
@@ -93,7 +135,7 @@ onMounted(load);
       >
         <div class="mobile-card__head">
           <div>
-            <h2 class="mobile-card__title">{{ item.ip || '-' }}</h2>
+            <h2 class="mobile-card__title mobile-card__title--break">{{ item.ip || '-' }}</h2>
             <p class="mobile-card__meta">#{{ item.id }} · {{ item.createdAtLabel }}</p>
           </div>
           <span class="meta-chip">{{ item.path || '/' }}</span>
@@ -108,37 +150,95 @@ onMounted(load);
             <dd class="mobile-card__ua">{{ item.userAgent || '-' }}</dd>
           </div>
         </dl>
+        <v-btn
+          class="mt-3"
+          block
+          size="small"
+          variant="tonal"
+          color="primary"
+          rounded="lg"
+          prepend-icon="mdi-eye-outline"
+          @click="openDetails(item)"
+        >
+          {{ $t('common.details') }}
+        </v-btn>
       </article>
       <p v-if="!items.length" class="mobile-list__empty">{{ $t('common.noData') }}</p>
     </section>
 
-    <div class="visitors-footer">
-      <div class="visitors-footer__total">
-        {{ $t('visitors.total', { count: total }) }}
-      </div>
-      <div class="visitors-footer__pager">
-        <v-btn
-          variant="tonal"
-          color="primary"
-          rounded="lg"
-          class="visitors-footer__btn"
-          :disabled="page <= 1"
-          @click="onPageChange(page - 1)"
-        >
-          {{ $t('common.previous') }}
-        </v-btn>
-        <v-btn
-          variant="tonal"
-          color="primary"
-          rounded="lg"
-          class="visitors-footer__btn"
-          :disabled="page * limit >= total"
-          @click="onPageChange(page + 1)"
-        >
-          {{ $t('common.next') }}
-        </v-btn>
-      </div>
-    </div>
+    <TablePagination
+      v-model:page="page"
+      v-model:limit="limit"
+      :total="total"
+      :total-text="totalText"
+    />
+
+    <v-dialog v-model="detailOpen" :fullscreen="!mdAndUp" max-width="560" @after-leave="closeDetails">
+      <v-card v-if="selected" rounded="xl">
+        <v-card-title class="text-h6 d-flex align-center justify-space-between">
+          <span>{{ $t('visitors.detailTitle') }}</span>
+          <v-btn icon="mdi-close" variant="text" @click="detailOpen = false" />
+        </v-card-title>
+        <v-card-text>
+          <dl class="detail-grid">
+            <div>
+              <dt>ID</dt>
+              <dd>{{ selected.id }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.ip') }}</dt>
+              <dd>{{ selected.ip || '-' }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.path') }}</dt>
+              <dd>{{ selected.path || '-' }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.referer') }}</dt>
+              <dd class="detail-grid__break">{{ selected.referer || '-' }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.createdAt') }}</dt>
+              <dd>{{ selected.createdAtLabel }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.country') }}</dt>
+              <dd>{{ selectedMeta.country || '-' }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.region') }}</dt>
+              <dd>{{ selectedMeta.region || '-' }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.city') }}</dt>
+              <dd>{{ selectedMeta.city || '-' }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.latitude') }}</dt>
+              <dd>{{ formatCoord(selectedMeta.latitude) }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.longitude') }}</dt>
+              <dd>{{ formatCoord(selectedMeta.longitude) }}</dd>
+            </div>
+            <div>
+              <dt>{{ $t('visitors.source') }}</dt>
+              <dd>{{ selectedMeta.source || '-' }}</dd>
+            </div>
+            <div class="detail-grid__full">
+              <dt>{{ $t('visitors.userAgent') }}</dt>
+              <dd class="detail-grid__break">{{ selected.userAgent || '-' }}</dd>
+            </div>
+          </dl>
+        </v-card-text>
+        <v-card-actions class="pa-4">
+          <v-spacer />
+          <v-btn color="primary" rounded="lg" @click="detailOpen = false">
+            {{ $t('common.close') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -152,29 +252,8 @@ onMounted(load);
   vertical-align: bottom;
 }
 
-.mobile-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.mobile-card__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.mobile-card__title {
-  margin: 0;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
+.mobile-card__title--break {
   word-break: break-all;
-}
-
-.mobile-card__meta {
-  margin: 0.25rem 0 0;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
 }
 
 .mobile-card__details {
@@ -205,44 +284,38 @@ onMounted(load);
   color: var(--ink-soft);
 }
 
-.mobile-list__empty {
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1rem;
   margin: 0;
-  padding: 2rem 1rem;
-  text-align: center;
+}
+
+.detail-grid dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink-soft);
 }
 
-.visitors-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1rem;
+.detail-grid dd {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
-.visitors-footer__total {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
+.detail-grid__full {
+  grid-column: 1 / -1;
 }
 
-.visitors-footer__pager {
-  display: flex;
-  gap: 0.5rem;
+.detail-grid__break {
+  word-break: break-word;
+  font-weight: 500;
 }
 
 @media (max-width: 720px) {
-  .visitors-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .visitors-footer__pager {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .visitors-footer__btn {
-    width: 100%;
+  .detail-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

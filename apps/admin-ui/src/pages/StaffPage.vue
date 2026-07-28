@@ -2,17 +2,24 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useDisplay } from 'vuetify';
+import { useI18n } from 'vue-i18n';
 import { useStaffListStore } from '../stores/staffList';
 import { useRolesStore } from '../stores/roles';
 import { useStaffStore } from '../stores/staff';
 import { Permissions } from '../constants';
+import { useClientTablePagination } from '../composables/useTablePagination';
+import AdminDataTable from '../components/AdminDataTable.vue';
+import TablePagination from '../components/TablePagination.vue';
 
 const staffListStore = useStaffListStore();
 const rolesStore = useRolesStore();
 const staffStore = useStaffStore();
 const { mdAndUp } = useDisplay();
+const { t } = useI18n();
 
 const { items } = storeToRefs(staffListStore);
+const { page, limit, total, pagedItems } = useClientTablePagination(items);
+
 const dialog = ref(false);
 const deleteDialog = ref(false);
 const editingId = ref(null);
@@ -37,12 +44,12 @@ const roleOptions = computed(() =>
 
 const headers = computed(() => [
   { title: 'ID', key: 'id', width: 80 },
-  { title: 'Username', key: 'username' },
-  { title: 'Fullname', key: 'fullname' },
-  { title: 'Role', key: 'roleLabel' },
-  { title: 'Active', key: 'isActive' },
-  { title: 'Admin', key: 'isAdmin' },
-  { title: 'Actions', key: 'actions', sortable: false, width: 160 },
+  { title: t('auth.username'), key: 'username' },
+  { title: t('profile.fullname'), key: 'fullname' },
+  { title: t('menu.roles'), key: 'roleLabel' },
+  { title: t('staff.active'), key: 'isActive' },
+  { title: t('staff.admin'), key: 'isAdmin' },
+  { title: t('common.actions'), key: 'actions', sortable: false, align: 'end', width: 120 },
 ]);
 
 const canCreate = computed(() => staffStore.hasPermission(Permissions.STAFFS_CREATE));
@@ -149,41 +156,44 @@ onMounted(async () => {
       </v-btn>
     </header>
 
-    <section v-if="mdAndUp" class="surface-panel quiet-table overflow-hidden">
-      <v-data-table :headers="headers" :items="items" item-value="id" class="bg-transparent">
-        <template #[`item.isActive`]="{ item }">
-          <v-chip size="small" :color="item.isActive ? 'success' : 'default'" variant="tonal">
-            {{ item.isActive ? $t('common.yes') : $t('common.no') }}
-          </v-chip>
-        </template>
-        <template #[`item.isAdmin`]="{ item }">
-          <v-chip size="small" :color="item.isAdmin ? 'primary' : 'default'" variant="tonal">
-            {{ item.isAdmin ? $t('common.yes') : $t('common.no') }}
-          </v-chip>
-        </template>
-        <template #[`item.actions`]="{ item }">
-          <v-btn
-            v-if="canUpdate"
-            icon="mdi-pencil"
-            variant="text"
-            size="small"
-            @click="openEdit(item)"
-          />
-          <v-btn
-            v-if="canDelete"
-            icon="mdi-delete"
-            variant="text"
-            size="small"
-            color="error"
-            @click="openDelete(item)"
-          />
-        </template>
-      </v-data-table>
-    </section>
+    <AdminDataTable
+      v-if="mdAndUp"
+      :headers="headers"
+      :items="pagedItems"
+      :items-per-page="limit"
+    >
+      <template #[`item.isActive`]="{ item }">
+        <v-chip size="small" :color="item.isActive ? 'success' : 'default'" variant="tonal">
+          {{ item.isActive ? $t('common.yes') : $t('common.no') }}
+        </v-chip>
+      </template>
+      <template #[`item.isAdmin`]="{ item }">
+        <v-chip size="small" :color="item.isAdmin ? 'primary' : 'default'" variant="tonal">
+          {{ item.isAdmin ? $t('common.yes') : $t('common.no') }}
+        </v-chip>
+      </template>
+      <template #[`item.actions`]="{ item }">
+        <v-btn
+          v-if="canUpdate"
+          icon="mdi-pencil"
+          variant="text"
+          size="small"
+          @click="openEdit(item)"
+        />
+        <v-btn
+          v-if="canDelete"
+          icon="mdi-delete"
+          variant="text"
+          size="small"
+          color="error"
+          @click="openDelete(item)"
+        />
+      </template>
+    </AdminDataTable>
 
     <section v-else class="mobile-list">
       <article
-        v-for="item in items"
+        v-for="item in pagedItems"
         :key="item.id"
         class="surface-panel surface-panel--pad mobile-card"
       >
@@ -225,8 +235,10 @@ onMounted(async () => {
           </v-chip>
         </div>
       </article>
-      <p v-if="!items.length" class="mobile-list__empty">{{ $t('common.noData') }}</p>
+      <p v-if="!pagedItems.length" class="mobile-list__empty">{{ $t('common.noData') }}</p>
     </section>
+
+    <TablePagination v-model:page="page" v-model:limit="limit" :total="total" />
 
     <v-dialog v-model="dialog" :fullscreen="!mdAndUp" max-width="520">
       <v-card rounded="xl" class="surface-dialog">
@@ -306,49 +318,6 @@ onMounted(async () => {
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-}
-
-.mobile-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.mobile-card__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.mobile-card__title {
-  margin: 0;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-}
-
-.mobile-card__meta {
-  margin: 0.25rem 0 0;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-}
-
-.mobile-card__actions {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.mobile-card__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.9rem;
-}
-
-.mobile-list__empty {
-  margin: 0;
-  padding: 2rem 1rem;
-  text-align: center;
-  color: var(--ink-soft);
 }
 
 @media (max-width: 720px) {

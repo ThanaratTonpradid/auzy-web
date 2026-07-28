@@ -17,7 +17,12 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
-    "noData": "No data yet"
+    "noData": "No data yet",
+    "actions": "Actions",
+    "details": "Details",
+    "itemsPerPage": "Per page",
+    "pageOf": "Page {page} of {total}",
+    "totalCount": "{count} total"
   },
   "auth": {
     "login": "Login",
@@ -100,8 +105,16 @@
     "location": "Location",
     "path": "Path",
     "userAgent": "User agent",
+    "referer": "Referer",
     "createdAt": "Time",
-    "total": "{count} total visits"
+    "total": "{count} total visits",
+    "detailTitle": "Visit details",
+    "country": "Country",
+    "region": "Region",
+    "city": "City",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "source": "Geo source"
   },
   "profile": {
     "title": "Profile",

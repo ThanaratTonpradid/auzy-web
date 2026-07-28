@@ -140,6 +140,49 @@ html[lang='en'] .v-application button {
   color: var(--ink-soft);
 }
 
+.mobile-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mobile-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mobile-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.mobile-card__meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.mobile-card__actions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.mobile-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
+.mobile-list__empty {
+  margin: 0;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
 @keyframes page-in {
   from {
     opacity: 0;
