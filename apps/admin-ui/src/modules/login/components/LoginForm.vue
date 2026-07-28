@@ -1,9 +1,11 @@
 <script setup>
+import { ref } from 'vue';
 import { useField, useForm } from 'vee-validate';
 import { useI18n } from 'vue-i18n';
 import * as yup from 'yup';
 
 const { t } = useI18n();
+const showPassword = ref(false);
 
 const schema = yup.object({
   username: yup.string().required(t('validation.required', { field: t('auth.username') })),
@@ -30,19 +32,33 @@ const submit = handleSubmit((values) => {
       :label="$t('auth.username')"
       autocomplete="username"
       prepend-inner-icon="mdi-account-outline"
+      rounded="lg"
+      hide-details="auto"
     />
 
     <v-text-field
       v-model="password.value.value"
       :error-messages="password.errorMessage.value"
       :label="$t('auth.password')"
-      type="password"
+      :type="showPassword ? 'text' : 'password'"
       autocomplete="current-password"
       prepend-inner-icon="mdi-lock-outline"
+      :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+      rounded="lg"
+      hide-details="auto"
       class="mt-3"
+      @click:append-inner="showPassword = !showPassword"
     />
 
-    <v-btn class="mt-5" color="primary" size="large" block type="submit">
+    <v-btn
+      class="mt-5"
+      color="primary"
+      size="large"
+      block
+      type="submit"
+      rounded="lg"
+      prepend-icon="mdi-login"
+    >
       {{ $t('auth.login') }}
     </v-btn>
   </form>

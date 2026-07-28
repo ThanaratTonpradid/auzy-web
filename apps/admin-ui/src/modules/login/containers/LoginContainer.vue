@@ -15,134 +15,250 @@ const login = async (values) => {
 </script>
 
 <template>
-  <section class="login-stage">
-    <div class="login-stage__orb login-stage__orb--a" aria-hidden="true"></div>
-    <div class="login-stage__orb login-stage__orb--b" aria-hidden="true"></div>
+  <section class="login-page">
+    <div class="login-page__pattern" aria-hidden="true" />
 
-    <header class="login-stage__top">
-      <RouterLink class="login-stage__brand" :to="{ name: 'public-profile' }">
-        {{ appConfig.appName }}
-      </RouterLink>
-      <LanguageSwitcher class="login-stage__lang" />
-    </header>
+    <div class="login-card">
+      <aside class="login-card__banner" aria-label="Brand">
+        <div class="login-card__grid" aria-hidden="true">
+          <span /><span /><span /><span />
+          <span /><span /><span /><span />
+        </div>
+        <div class="login-card__banner-fade" aria-hidden="true" />
+        <div class="login-card__banner-body">
+          <RouterLink class="login-card__brand" :to="{ name: 'public-profile' }">
+            {{ appConfig.appName }}
+          </RouterLink>
+          <h1 class="login-card__banner-title">{{ $t('auth.bannerTitle') }}</h1>
+          <p class="login-card__banner-copy">{{ $t('auth.bannerCopy') }}</p>
+        </div>
+      </aside>
 
-    <div class="login-stage__panel">
-      <p class="login-stage__eyebrow">{{ $t('common.appName') }}</p>
-      <h1 class="login-stage__title">{{ $t('auth.login') }}</h1>
-      <p class="login-stage__copy">
-        {{ $t('auth.loginSubtitle') }}
-      </p>
-      <LoginForm class="mt-8" @submit="login" />
+      <div class="login-card__form">
+        <div class="login-card__form-top">
+          <LanguageSwitcher />
+        </div>
+
+        <div class="login-card__form-body">
+          <h2 class="login-card__title">{{ $t('auth.login') }}</h2>
+          <p class="login-card__subtitle">{{ $t('auth.loginSubtitle') }}</p>
+          <LoginForm class="login-card__fields" @submit="login" />
+        </div>
+
+        <p class="login-card__build">
+          {{ appConfig.appName }} · v{{ appConfig.appVersion }}
+        </p>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.login-stage {
+.login-page {
   position: relative;
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 1.5rem;
   overflow: hidden;
+  background: #eef2f0;
 }
 
-.login-stage__orb {
+.login-page__pattern {
   position: absolute;
-  border-radius: 999px;
-  filter: blur(8px);
+  inset: 0;
+  opacity: 0.45;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(18, 32, 28, 0.08) 1px, transparent 0);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
   pointer-events: none;
 }
 
-.login-stage__orb--a {
-  width: 28rem;
-  height: 28rem;
-  top: -8rem;
-  right: -6rem;
-  background: radial-gradient(circle, rgba(31, 122, 102, 0.28), transparent 68%);
-  animation: drift 10s ease-in-out infinite alternate;
-}
-
-.login-stage__orb--b {
-  width: 22rem;
-  height: 22rem;
-  bottom: -7rem;
-  left: -5rem;
-  background: radial-gradient(circle, rgba(18, 32, 28, 0.16), transparent 70%);
-  animation: drift 12s ease-in-out infinite alternate-reverse;
-}
-
-.login-stage__top {
-  position: absolute;
-  inset: 1.25rem 1.25rem auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 2;
-}
-
-.login-stage__brand {
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.login-stage__lang {
-  flex-shrink: 0;
-}
-
-.login-stage__panel {
+.login-card {
   position: relative;
   z-index: 1;
-  width: min(420px, 100%);
-  padding: 2rem 1.75rem;
-  border-radius: 24px;
-  border: 1px solid rgba(18, 32, 28, 0.1);
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 24px 60px rgba(18, 32, 28, 0.1);
-  animation: rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(920px, 100%);
+  min-height: min(560px, calc(100vh - 3rem));
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow:
+    0 24px 60px rgba(18, 32, 28, 0.12),
+    0 2px 0 rgba(255, 255, 255, 0.6) inset;
+  animation: rise 560ms var(--motion) both;
 }
 
-.login-stage__eyebrow {
-  margin: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
+.login-card__banner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+  color: #f4faf7;
+  background: #145547;
+  overflow: hidden;
 }
 
-.login-stage__title {
-  margin: 0.55rem 0 0;
-  font-size: clamp(2rem, 5vw, 2.6rem);
-  line-height: 1;
+.login-card__grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-rows: 1.1fr 0.7fr 1fr;
+  gap: 0;
+}
+
+.login-card__grid span:nth-child(1) {
+  background: #1f7a66;
+}
+.login-card__grid span:nth-child(2) {
+  background: #0f3f35;
+}
+.login-card__grid span:nth-child(3) {
+  background: #176955;
+  grid-column: 1;
+}
+.login-card__grid span:nth-child(4) {
+  background: #2a9b82;
+}
+.login-card__grid span:nth-child(5) {
+  background: #0c332b;
+  grid-column: 1 / -1;
+}
+.login-card__grid span:nth-child(6),
+.login-card__grid span:nth-child(7),
+.login-card__grid span:nth-child(8) {
+  display: none;
+}
+
+.login-card__banner-fade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8, 28, 24, 0.15) 0%, rgba(8, 28, 24, 0.55) 100%),
+    radial-gradient(circle at 80% 18%, rgba(255, 255, 255, 0.16), transparent 36%);
+  pointer-events: none;
+}
+
+.login-card__banner-body {
+  position: relative;
+  z-index: 1;
+}
+
+.login-card__brand {
+  display: inline-block;
+  margin-bottom: 1.75rem;
+  color: inherit;
+  text-decoration: none;
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+  font-weight: 700;
   letter-spacing: -0.04em;
+  line-height: 1;
 }
 
-.login-stage__copy {
+.login-card__banner-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  max-width: 12ch;
+}
+
+.login-card__banner-copy {
   margin: 0.75rem 0 0;
+  max-width: 28ch;
+  color: rgba(244, 250, 247, 0.82);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.login-card__form {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: #fff;
+  min-width: 0;
+}
+
+.login-card__form-top {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.1rem 1.25rem 0;
+}
+
+.login-card__form-body {
+  width: min(340px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 1.25rem 0 1.5rem;
+  align-self: center;
+}
+
+.login-card__title {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.login-card__subtitle {
+  margin: 0.55rem 0 0;
   color: var(--ink-soft);
   line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.login-card__fields {
+  margin-top: 1.5rem;
+}
+
+.login-card__build {
+  margin: 0;
+  padding: 0 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.72rem;
+  color: rgba(61, 82, 74, 0.55);
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(16px) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-@keyframes drift {
-  from {
-    transform: translate3d(0, 0, 0);
+@media (max-width: 860px) {
+  .login-card {
+    grid-template-columns: 1fr;
+    min-height: auto;
   }
-  to {
-    transform: translate3d(12px, -18px, 0);
+
+  .login-card__banner {
+    min-height: 200px;
+    padding: 1.5rem;
+  }
+
+  .login-card__brand {
+    margin-bottom: 1rem;
+    font-size: 1.7rem;
+  }
+
+  .login-card__banner-title {
+    max-width: none;
+    font-size: 1.25rem;
+  }
+
+  .login-card__form-body {
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
   }
 }
 </style>
