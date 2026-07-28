@@ -1,11 +1,13 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useDisplay } from 'vuetify';
 import { useRolesStore } from '../stores/roles';
 import { useStaffStore } from '../stores/staff';
 
 const rolesStore = useRolesStore();
 const staffStore = useStaffStore();
+const { mdAndUp } = useDisplay();
 const { items, permissions } = storeToRefs(rolesStore);
 
 const dialog = ref(false);
@@ -69,6 +71,7 @@ onMounted(async () => {
             variant="tonal"
             color="primary"
             rounded="lg"
+            class="role-card__edit"
             prepend-icon="mdi-shield-edit-outline"
             @click="openEdit(role)"
           >
@@ -93,10 +96,11 @@ onMounted(async () => {
       </section>
     </div>
 
-    <v-dialog v-model="dialog" max-width="560">
+    <v-dialog v-model="dialog" :fullscreen="!mdAndUp" max-width="560">
       <v-card rounded="xl">
-        <v-card-title class="text-h6">
-          {{ $t('roles.editPermissions') }} — {{ editingRole?.label }}
+        <v-card-title class="text-h6 d-flex align-center justify-space-between">
+          <span>{{ $t('roles.editPermissions') }} — {{ editingRole?.label }}</span>
+          <v-btn v-if="!mdAndUp" icon="mdi-close" variant="text" @click="dialog = false" />
         </v-card-title>
         <v-card-text>
           <v-alert v-if="formError" type="error" variant="tonal" class="mb-4">
@@ -192,6 +196,10 @@ onMounted(async () => {
 
   .role-card__head {
     flex-direction: column;
+  }
+
+  .role-card__edit {
+    width: 100%;
   }
 }
 </style>

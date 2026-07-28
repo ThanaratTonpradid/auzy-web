@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useDisplay } from 'vuetify';
 import { useStaffListStore } from '../stores/staffList';
 import { useRolesStore } from '../stores/roles';
 import { useStaffStore } from '../stores/staff';
@@ -9,6 +10,7 @@ import { Permissions } from '../constants';
 const staffListStore = useStaffListStore();
 const rolesStore = useRolesStore();
 const staffStore = useStaffStore();
+const { mdAndUp } = useDisplay();
 
 const { items } = storeToRefs(staffListStore);
 const dialog = ref(false);
@@ -140,13 +142,14 @@ onMounted(async () => {
         color="primary"
         rounded="lg"
         prepend-icon="mdi-plus"
+        class="page-header__action"
         @click="openCreate"
       >
         {{ $t('staff.create') }}
       </v-btn>
     </header>
 
-    <section class="surface-panel quiet-table overflow-hidden">
+    <section v-if="mdAndUp" class="surface-panel quiet-table overflow-hidden">
       <v-data-table :headers="headers" :items="items" item-value="id" class="bg-transparent">
         <template #[`item.isActive`]="{ item }">
           <v-chip size="small" :color="item.isActive ? 'success' : 'default'" variant="tonal">
@@ -178,10 +181,58 @@ onMounted(async () => {
       </v-data-table>
     </section>
 
-    <v-dialog v-model="dialog" max-width="520">
+    <section v-else class="mobile-list">
+      <article
+        v-for="item in items"
+        :key="item.id"
+        class="surface-panel surface-panel--pad mobile-card"
+      >
+        <div class="mobile-card__head">
+          <div>
+            <h2 class="mobile-card__title">{{ item.fullname || item.username }}</h2>
+            <p class="mobile-card__meta">@{{ item.username }} · #{{ item.id }}</p>
+          </div>
+          <div class="mobile-card__actions">
+            <v-btn
+              v-if="canUpdate"
+              icon="mdi-pencil"
+              variant="text"
+              size="small"
+              @click="openEdit(item)"
+            />
+            <v-btn
+              v-if="canDelete"
+              icon="mdi-delete"
+              variant="text"
+              size="small"
+              color="error"
+              @click="openDelete(item)"
+            />
+          </div>
+        </div>
+        <div class="mobile-card__chips">
+          <span class="meta-chip">{{ item.roleLabel || '-' }}</span>
+          <v-chip size="small" :color="item.isActive ? 'success' : 'default'" variant="tonal">
+            {{ item.isActive ? $t('staff.active') : $t('common.no') }}
+          </v-chip>
+          <v-chip
+            v-if="item.isAdmin"
+            size="small"
+            color="primary"
+            variant="tonal"
+          >
+            {{ $t('staff.admin') }}
+          </v-chip>
+        </div>
+      </article>
+      <p v-if="!items.length" class="mobile-list__empty">{{ $t('common.noData') }}</p>
+    </section>
+
+    <v-dialog v-model="dialog" :fullscreen="!mdAndUp" max-width="520">
       <v-card rounded="xl" class="surface-dialog">
-        <v-card-title class="text-h6">
-          {{ editingId ? $t('staff.edit') : $t('staff.create') }}
+        <v-card-title class="text-h6 d-flex align-center justify-space-between">
+          <span>{{ editingId ? $t('staff.edit') : $t('staff.create') }}</span>
+          <v-btn v-if="!mdAndUp" icon="mdi-close" variant="text" @click="dialog = false" />
         </v-card-title>
         <v-card-text>
           <v-alert v-if="formError" type="error" variant="tonal" class="mb-4">
@@ -257,10 +308,57 @@ onMounted(async () => {
   gap: 1rem;
 }
 
+.mobile-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mobile-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mobile-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.mobile-card__meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.mobile-card__actions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.mobile-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
+.mobile-list__empty {
+  margin: 0;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
 @media (max-width: 720px) {
   .page-header--row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .page-header__action {
+    width: 100%;
   }
 }
 </style>

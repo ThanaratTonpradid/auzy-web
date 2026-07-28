@@ -1,10 +1,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import { useDisplay } from 'vuetify';
 import { listVisitorLogsService } from '../services/visitor';
 import { useAppStore } from '../stores/app';
 import { i18n } from '../plugins/i18n';
 
 const appStore = useAppStore();
+const { mdAndUp } = useDisplay();
 const items = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -63,7 +65,7 @@ onMounted(load);
       <p class="page-header__subtitle">{{ $t('visitors.subtitle') }}</p>
     </header>
 
-    <section class="surface-panel quiet-table overflow-hidden">
+    <section v-if="mdAndUp" class="surface-panel quiet-table overflow-hidden">
       <v-data-table
         :headers="headers"
         :items="items"
@@ -83,6 +85,33 @@ onMounted(load);
       </v-data-table>
     </section>
 
+    <section v-else class="mobile-list">
+      <article
+        v-for="item in items"
+        :key="item.id"
+        class="surface-panel surface-panel--pad mobile-card"
+      >
+        <div class="mobile-card__head">
+          <div>
+            <h2 class="mobile-card__title">{{ item.ip || '-' }}</h2>
+            <p class="mobile-card__meta">#{{ item.id }} · {{ item.createdAtLabel }}</p>
+          </div>
+          <span class="meta-chip">{{ item.path || '/' }}</span>
+        </div>
+        <dl class="mobile-card__details">
+          <div>
+            <dt>{{ $t('visitors.location') }}</dt>
+            <dd>{{ item.location }}</dd>
+          </div>
+          <div>
+            <dt>{{ $t('visitors.userAgent') }}</dt>
+            <dd class="mobile-card__ua">{{ item.userAgent || '-' }}</dd>
+          </div>
+        </dl>
+      </article>
+      <p v-if="!items.length" class="mobile-list__empty">{{ $t('common.noData') }}</p>
+    </section>
+
     <div class="visitors-footer">
       <div class="visitors-footer__total">
         {{ $t('visitors.total', { count: total }) }}
@@ -92,6 +121,7 @@ onMounted(load);
           variant="tonal"
           color="primary"
           rounded="lg"
+          class="visitors-footer__btn"
           :disabled="page <= 1"
           @click="onPageChange(page - 1)"
         >
@@ -101,6 +131,7 @@ onMounted(load);
           variant="tonal"
           color="primary"
           rounded="lg"
+          class="visitors-footer__btn"
           :disabled="page * limit >= total"
           @click="onPageChange(page + 1)"
         >
@@ -119,6 +150,66 @@ onMounted(load);
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;
+}
+
+.mobile-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mobile-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mobile-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  word-break: break-all;
+}
+
+.mobile-card__meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.mobile-card__details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.95rem 0 0;
+}
+
+.mobile-card__details dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.mobile-card__details dd {
+  margin: 0.2rem 0 0;
+  font-weight: 550;
+  line-height: 1.45;
+}
+
+.mobile-card__ua {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.mobile-list__empty {
+  margin: 0;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--ink-soft);
 }
 
 .visitors-footer {
@@ -143,6 +234,15 @@ onMounted(load);
   .visitors-footer {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .visitors-footer__pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .visitors-footer__btn {
+    width: 100%;
   }
 }
 </style>

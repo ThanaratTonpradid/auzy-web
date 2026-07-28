@@ -70,9 +70,10 @@ html[lang='en'] .v-application button {
 }
 
 .page-shell {
-  width: min(1120px, calc(100% - 2rem));
-  margin: 0 auto;
-  padding: 1.5rem 0 2.5rem;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 1.5rem 1.5rem 2.5rem;
   animation: page-in 480ms var(--motion) both;
 }
 
@@ -90,7 +91,7 @@ html[lang='en'] .v-application button {
 
 .page-header__title {
   margin: 0;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
   line-height: 1.1;
   letter-spacing: -0.03em;
   font-weight: 700;
@@ -152,7 +153,6 @@ html[lang='en'] .v-application button {
 
 @media (max-width: 960px) {
   .page-shell {
-    width: min(100%, calc(100% - 1.25rem));
-    padding-top: 1rem;
+    padding: 1rem 1rem 2rem;
   }
 }

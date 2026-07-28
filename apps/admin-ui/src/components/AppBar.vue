@@ -177,8 +177,16 @@ const toggleNavbar = () => {
     display: none;
   }
 
+  .admin-topbar__actions {
+    gap: 0.4rem;
+  }
+
   .admin-topbar :deep(.v-toolbar__content) {
     padding: 0 0.65rem;
+  }
+
+  .admin-topbar__title {
+    font-size: 0.98rem;
   }
 }
 </style>

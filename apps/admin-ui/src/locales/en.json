@@ -16,7 +16,8 @@
     "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
-    "ok": "OK"
+    "ok": "OK",
+    "noData": "No data yet"
   },
   "auth": {
     "login": "Login",

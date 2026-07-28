@@ -12,7 +12,15 @@ import AppBar from '../components/AppBar.vue';
 </template>
 
 <style scoped>
+.private-layout {
+  min-height: 100vh;
+}
+
 .private-layout__main {
   min-height: 100vh;
+}
+
+.private-layout__main :deep(.v-main__wrap) {
+  width: 100%;
 }
 </style>
