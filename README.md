@@ -53,6 +53,8 @@ pnpm build:ui
 
 Target: Basic Shared CPU Regular, 1 vCPU / 1GB RAM / 25GB SSD, SGP1, Debian 13.
 
+### First-time setup (once)
+
 ```sh
 # On the droplet (as root)
 bash deploy/setup-droplet.sh
@@ -62,6 +64,18 @@ cp deploy/.env.example deploy/.env
 # edit secrets in deploy/.env
 docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build
 ```
+
+### GitHub Actions deploy
+
+Push to `main` (or run **Actions → Deploy → Run workflow**) syncs the repo to `/opt/auzy-web` and rebuilds the stack. `deploy/.env` on the droplet is never overwritten.
+
+Required repository secrets:
+
+| Secret | Example |
+| --- | --- |
+| `DEPLOY_HOST` | `165.22.98.136` |
+| `DEPLOY_USER` | `root` |
+| `DEPLOY_SSH_KEY` | private key (ed25519) whose public key is in the droplet `authorized_keys` |
 
 Notes:
 - Public profile is at `/` and records visits via `POST /api/public/visit`
