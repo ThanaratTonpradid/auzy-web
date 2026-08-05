@@ -18,15 +18,20 @@ func init() {
 
 func AutoReadConfig(cfgFile string) {
 	configFile := "local.env"
-	if cfgFile != "" {
+	explicit := cfgFile != ""
+	if explicit {
 		configFile = cfgFile
 	}
 
-	if err := helper.ReadConfig(configFile); err == nil {
-		log.Infof("Using config file: %s", viper.ConfigFileUsed())
-	} else if cfgFile != "" {
-		log.Fatalf("Config file: %s, %s", viper.ConfigFileUsed(), err)
+	if err := helper.ReadConfig(configFile); err != nil {
+		if explicit {
+			log.Fatalf("Config file: %s, %s", configFile, err)
+		}
+		// Default local.env is optional; Docker / production can rely on env vars.
+		log.Infof("No config file loaded (%s); using environment variables", err)
+		return
 	}
+	log.Infof("Using config file: %s", viper.ConfigFileUsed())
 }
 
 func AutoLoadConfig(config interface{}) {
